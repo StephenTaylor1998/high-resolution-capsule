@@ -106,8 +106,7 @@ class Mask(nn.Module):
             x, mask = x
         else:
             x = torch.sqrt(torch.sum(torch.square(x), -1))
-            indices = torch.argmax(x, 1)
-            mask = F.one_hot(indices, num_classes=x.shape[1])
+            mask = F.one_hot(torch.argmax(x, 1), num_classes=x.shape[1])
 
         masked = torch.flatten(x * torch.unsqueeze(mask, -1), 1)
         return masked
