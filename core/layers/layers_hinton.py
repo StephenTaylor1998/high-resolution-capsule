@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 from torch import nn
 from torch.nn import functional as F
@@ -17,7 +18,7 @@ class Squash(nn.Module):
 
 class PrimaryCaps(nn.Module):
     def __init__(self, in_channel, num_capsule, capsule_length, kernel_size, stride, groups=1,
-                 out_capsule_last=True, init_mode='glorot'):
+                 padding=0, out_capsule_last=True, init_mode='glorot'):
         super(PrimaryCaps, self).__init__()
         self.in_channel = in_channel
         self.num_capsule = num_capsule
@@ -25,6 +26,7 @@ class PrimaryCaps(nn.Module):
         self.kernel_size = kernel_size
         self.stride = stride
         self.groups = groups
+        self.padding = padding
         self.out_capsule_last = out_capsule_last
         kernel = torch.empty(self.num_capsule * self.capsule_length, self.in_channel // groups, kernel_size,
                              kernel_size)
@@ -34,15 +36,13 @@ class PrimaryCaps(nn.Module):
         self.squash = Squash()
 
     def forward(self, x):
-        x = F.conv2d(x, self.kernel, stride=self.stride, groups=self.groups)
+        x = F.conv2d(x, self.kernel, stride=self.stride, padding=self.padding, groups=self.groups)
         H, W = x.shape[-2], x.shape[-1]
-        x = torch.reshape(x, (self.num_capsule, self.capsule_length, H, W))
+        x = torch.reshape(x, (-1, self.num_capsule, self.capsule_length, H, W))
         x /= self.num_capsule
         x += self.biases
         x = self.squash(x)
-        if self.out_capsule_last:
-            # [num_capsule, capsule_length, H, W]>>>[H, W, num_capsule, capsule_length]
-            x = x.permute((-1, 2, 3, 0, 1))
+        x = x.permute((0, 3, 4, 1, 2)) if self.out_capsule_last else x
         return x
 
 
@@ -65,7 +65,8 @@ class DigitCaps(nn.Module):
         x = torch.reshape(x, (-1, h * w * in_num_capsule, in_capsule_length))  # x shape=(None,H*W*input_C,input_L)
 
         u = torch.einsum('...ji,jik->...jk', x, self.weight)  # u shape=(None,H*W*input_C,C*L)
-        u = torch.reshape(u, (-1, h * w * in_num_capsule, self.num_capsule, self.capsule_length))  # u shape=(None,H*W*input_C,C,L)
+        u = torch.reshape(u, (
+            -1, h * w * in_num_capsule, self.num_capsule, self.capsule_length))  # u shape=(None,H*W*input_C,C,L)
 
         if self.routing:
             # Hinton's routing
@@ -94,3 +95,38 @@ class Length(nn.Module):
 
     def forward(self, x):
         return torch.sqrt(torch.sum(torch.square(x), - 1) + self.eps)
+
+
+class Mask(nn.Module):
+    def __init__(self):
+        super(Mask, self).__init__()
+
+    def forward(self, x):
+        if type(x) is list:
+            x, mask = x
+        else:
+            x = torch.sqrt(torch.sum(torch.square(x), -1))
+            indices = torch.argmax(x, 1)
+            mask = F.one_hot(indices, num_classes=x.shape[1])
+
+        masked = torch.flatten(x * torch.unsqueeze(mask, -1), 1)
+        return masked
+
+
+class Generator(nn.Module):
+    def __init__(self, input_shape):
+        super(Generator, self).__init__()
+        self.input_shape = input_shape
+        self.l1 = nn.Linear(160, 512)
+        self.a1 = nn.ReLU(True)
+        self.l2 = nn.Linear(512, 1024)
+        self.a2 = nn.ReLU(True)
+        self.l3 = nn.Linear(1024, np.prod(input_shape))
+        self.a3 = nn.Sigmoid()
+
+    def forward(self, x):
+        x = self.a1(self.l1(x))
+        x = self.a2(self.l2(x))
+        x = self.a3(self.l3(x))
+        x = torch.reshape(x, self.input_shape)
+        return x
