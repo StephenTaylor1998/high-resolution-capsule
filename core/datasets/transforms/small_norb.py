@@ -48,6 +48,14 @@ def sample_weights(labels):
     return class_weights[list(map(int, labels))]
 
 
+class DefaultArgs(object):
+    def __init__(self):
+        super(DefaultArgs, self).__init__()
+        self.crop_dim = None
+        self.brightness = None
+        self.contrast = None
+
+
 def get_transform(args):
     return {
         'train_valid': transforms.Compose([
