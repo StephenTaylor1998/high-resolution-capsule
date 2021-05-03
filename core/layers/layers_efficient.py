@@ -26,7 +26,7 @@ class PrimaryCaps(nn.Module):
 
     def forward(self, x):
         x = self.conv(x)
-        x = torch.reshape(x, (-1, self.num_capsule, self.capsule_length))
+        x = torch.reshape(x, (x.shape[0], self.num_capsule, self.capsule_length))
         x = self.squash(x)
         print(x.shape)
         x = x.permute((0, 1, 2)) if self.out_capsule_last else x
@@ -45,14 +45,9 @@ class FCCaps(nn.Module):
 
     def forward(self, x):
         u = torch.einsum('...ji,kjiz->...kjz', x, self.weight)  # u shape=(None,N,H*W*input_N,D)
-
         c = torch.einsum('...ij,...kj->...i', u, u)[..., None]  # b shape=(None,N,H*W*input_N,1) -> (None,j,i,1)
-
         c = c / torch.sqrt(torch.from_numpy(np.array([self.out_capsule_length], dtype=np.float32)))
-        # c = c / torch.sqrt(torch.from_numpy(self.out_capsule_length))
         c = F.softmax(c, dim=1)  # c shape=(None,N,H*W*input_N,1) -> (None,j,i,1)
-        print("c", c.shape)
-        print("self.biases", self.biases.shape)
         c = c + self.biases
         s = torch.sum(torch.multiply(u, c), dim=-2)  # s shape=(None,N,D)
         v = Squash()(s)  # v shape=(None,N,D)
@@ -80,21 +75,21 @@ class Mask(nn.Module):
             else:
                 x, mask = x
         else:
-            x = torch.sqrt(torch.sum(torch.square(x), -1))
+            length = torch.sqrt(torch.sum(torch.square(x), -1))
             if double_mask:
-                mask1 = F.one_hot(torch.argmax(x, 1), num_classes=x.shape[1])
-                mask2 = F.one_hot(torch.argmax(x, 1), num_classes=x.shape[1])
+                mask1 = F.one_hot(torch.argmax(length, 1), num_classes=length.shape[1])
+                mask2 = F.one_hot(torch.argmax(length, 1), num_classes=length.shape[1])
 
             else:
 
-                mask = F.one_hot(torch.argmax(x, 1), num_classes=x.shape[1])
+                mask = F.one_hot(torch.argmax(length, 1), num_classes=length.shape[1])
 
         if double_mask:
             masked1 = torch.flatten(x * torch.unsqueeze(mask1, -1), 1)
             masked2 = torch.flatten(x * torch.unsqueeze(mask2, -1), 1)
             return masked1, masked2
-        else:
 
+        else:
             masked = torch.flatten(x * torch.unsqueeze(mask, -1), 1)
             return masked
 
@@ -114,5 +109,5 @@ class Generator(nn.Module):
         x = self.a1(self.l1(x))
         x = self.a2(self.l2(x))
         x = self.a3(self.l3(x))
-        x = torch.reshape(x, self.input_shape)
+        x = torch.reshape(x, (x.shape[0], *self.input_shape))
         return x
