@@ -54,3 +54,7 @@ class Model(nn.Module):
 
         generate = self.generator(masked)
         return classes, generate
+
+
+def capsule_efficient(in_channels, out_shape, mode='train'):
+    return Model(in_channels, out_shape, mode)
