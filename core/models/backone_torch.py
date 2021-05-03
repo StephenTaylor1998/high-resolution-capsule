@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
 from core.layers.transforms.dwt import DWTForward
+
+
 class BasicBlock(nn.Module):
     expansion = 1
 
@@ -9,25 +11,23 @@ class BasicBlock(nn.Module):
         self.in_planes = in_planes
         self.planes = planes
         self.stride = stride
-        self.conv1 = nn.Conv2d(self.in_planes, self.planes, kernel_size=3, stride=self.stride, padding=1)
-        self.b1 = nn.BatchNorm2d
-        self.conv2 = nn.Conv2d(self.planes, self.planes, kernel_size=3, stride=1, padding=1)
-        self.bn2 = nn.BatchNorm2d
+        self.conv1 = nn.Conv2d(self.in_planes, self.planes, kernel_size=3, stride=self.stride, padding=1,bias=False)
+        self.bn1 = nn.BatchNorm2d(self.planes)
+        self.conv2 = nn.Conv2d(self.planes, self.planes, kernel_size=3, stride=1, padding=1,bias=False)
+        self.bn2 = nn.BatchNorm2d(self.planes)
         self.relu = nn.ReLU()
         self.shortcut = nn.Sequential()
         if self.stride != 1 or self.in_planes != self.expansion * self.planes:
             self.shortcut = nn.Sequential(
-                nn.Conv2d(self.planes, self.expansion * self.planes, kernel_size=1, stride=self.stride),
-                nn.BatchNorm2d(self.expansion * self.planes)
-            )
+                nn.Conv2d(self.in_planes, self.expansion * self.planes, kernel_size=1, stride=self.stride,bias=False),
+                nn.BatchNorm2d(self.expansion * self.planes))
 
-
-def forward(self, inputs, **kwargs):
-    out = self.relu(self.bn1(self.conv1(inputs)))
-    out = self.bn2(self.conv2(out))
-    out += self.shortcut(inputs)
-    out = self.relu(out)
-    return out
+    def forward(self, inputs, **kwargs):
+        out = self.relu(self.bn1(self.conv1(inputs)))
+        out = self.bn2(self.conv2(out))
+        out += self.shortcut(inputs)
+        out = self.relu(out)
+        return out
 
 
 class Bottleneck(nn.Module):
@@ -39,19 +39,17 @@ class Bottleneck(nn.Module):
         self.planes = planes
         self.stride = stride
 
-        self.conv1 = nn.Conv2d(self.in_planes, self.planes, kernel_size=1
-                               )
-        self.bn1 = nn.BatchNorm2d
-        self.conv2 = nn.Conv2d(self.planes, self.planes, kernel_size=3, stride=self.stride, padding=1
-                               )
-        self.bn2 = nn.BatchNorm2d
+        self.conv1 = nn.Conv2d(self.in_planes, self.planes, kernel_size=1,bias=False)
+        self.bn1 = nn.BatchNorm2d(self.planes)
+        self.conv2 = nn.Conv2d(self.planes, self.planes, kernel_size=3, stride=self.stride, padding=1,bias=False)
+        self.bn2 = nn.BatchNorm2d(self.planes)
         self.conv3 = nn.Conv2d(self.planes, self.expansion * self.planes, kernel_size=1)
-        self.bn3 = nn.BatchNorm2d
+        self.bn3 = nn.BatchNorm2d(self.expansion * self.planes)
         self.relu = nn.ReLU()
         self.shortcut = nn.Sequential()
         if self.stride != 1 or self.in_planes != self.expansion * self.planes:
             self.shortcut = nn.Sequential(
-                nn.Conv2d(self.in_lanes, self.expansion * self.planes, kernel_size=1, stride=self.stride),
+                nn.Conv2d(self.in_planes, self.expansion * self.planes, kernel_size=1, stride=self.stride,bias=False),
                 nn.BatchNorm2d(self.expansion * self.planes)
             )
 
@@ -75,18 +73,16 @@ class TinyBlockDWT(nn.Module):
         if self.stride == 2:
             self.conv1 = DWTForward()
         else:
-            self.conv1 = nn.Conv2d(self.in_planes, self.planes / 2, kernel_size=3, stride=1, padding=1
+            self.conv1 = nn.Conv2d(self.in_planes, self.planes / 2, kernel_size=3, stride=1, padding=1,bias=False)
 
-                                   )
-
-        self.bn1 = nn.BatchNorm2d
-        self.conv2 = nn.Conv2d(self.planes / 2, self.planes, kernel_size=1, stride=1, padding=1)
-        self.bn2 = nn.BatchNorm2d
+        self.bn1 = nn.BatchNorm2d(self.planes / 2)
+        self.conv2 = nn.Conv2d(self.planes / 2, self.planes, kernel_size=1, stride=1, padding=1,bias=False)
+        self.bn2 = nn.BatchNorm2d(self.planes)
         self.relu = nn.ReLU()
         self.shortcut = nn.Sequential()
         if self.stride != 1 or self.in_planes != self.expansion * self.planes:
             self.shortcut = nn.Sequential(
-                nn.Conv2d(self.in_planes, self.expansion * self.planes, kernel_size=1, stride=self.stride
+                nn.Conv2d(self.in_planes, self.expansion * self.planes, kernel_size=1, stride=self.stride,bias=False
                           ),
                 nn.BatchNorm2d(self.expansion * self.planes)
 
@@ -109,25 +105,25 @@ class TinyBottleDWT(nn.Module):
         self.planes = planes
         self.stride = stride
 
-        self.conv1 = nn.Conv2d(self.in_planes, self.planes, kernel_size=1
+        self.conv1 = nn.Conv2d(self.in_planes, self.planes, kernel_size=1,bias=False
 
                                )
-        self.bn1 = nn.BatchNorm2d
+        self.bn1 = nn.BatchNorm2d(self.planes)
         if stride == 2:
             self.conv2 = DWTForward()
         else:
-            self.conv2 = nn.Conv2d(self.planes, self.planes / 2, kernel_size=3, stride=self.stride, padding=1
+            self.conv2 = nn.Conv2d(self.planes, self.planes / 2, kernel_size=3, stride=self.stride, padding=1,bias=False
                                    )
-        self.bn2 = nn.BatchNorm2d
-        self.conv3 = nn.Conv2d(self.planes / 2, self.expansion * self.planes, kernel_size=1
+        self.bn2 = nn.BatchNorm2d(self.planes / 2)
+        self.conv3 = nn.Conv2d(self.planes / 2, self.expansion * self.planes, kernel_size=1,bias=False
 
                                )
-        self.bn3 = nn.BatchNorm2d
+        self.bn3 = nn.BatchNorm2d(self.expansion * self.planes)
         self.relu = nn.ReLU()
         self.shortcut = nn.Sequential()
         if self.stride != 1 or self.in_planes != self.expansion * self.planes:
             self.shortcut = nn.Sequential(
-                nn.Conv2d(self.in_planes, self.expansion * self.planes, kernel_size=1, stride=self.stride
+                nn.Conv2d(self.in_planes, self.expansion * self.planes, kernel_size=1, stride=self.stride,bias=False
 
                           ),
                 nn.BatchNorm2d(self.expansion * self.planes)
@@ -153,18 +149,16 @@ class BasicBlockDWT(nn.Module):
         if self.stride == 2:
             self.conv1 = DWTForward()
         else:
-            self.conv1 = nn.Conv2d(self.in_planes, self.planes, kernel_size=3, stride=1, padding=1)
+            self.conv1 = nn.Conv2d(self.in_planes, self.planes, kernel_size=3, stride=1, padding=1, bias=False)
 
-        self.bn1 = nn.BatchNorm2d
-        self.conv2 = nn.Conv2d(self.planes, self.planes, kernel_size=3, stride=1, padding=1,
-
-                               )
-        self.bn2 = nn.BatchNorm2d
+        self.bn1 = nn.BatchNorm2d(self.planes)
+        self.conv2 = nn.Conv2d(self.planes, self.planes, kernel_size=3, stride=1, padding=1,bias=False)
+        self.bn2 = nn.BatchNorm2d(self.planes)
         self.relu = nn.ReLU()
         self.shortcut = nn.Sequential()
         if self.stride != 1 or self.in_planes != self.expansion * self.planes:
             self.shortcut = nn.Sequential(
-                nn.Conv2d(self.in_planes, self.expansion * self.planes, kernel_size=1, stride=self.stride
+                nn.Conv2d(self.in_planes, self.expansion * self.planes, kernel_size=1, stride=self.stride,bias=False
                           ),
                 nn.BatchNorm2d(self.expansion * self.planes)
             )
@@ -186,29 +180,21 @@ class BottleneckDWT(nn.Module):
         self.planes = planes
         self.stride = stride
 
-        self.conv1 = nn.Conv2d(self.in_planes, self.planes, kernel_size=1
-
-                               )
-        self.bn1 = nn.BatchNorm2d
+        self.conv1 = nn.Conv2d(self.in_planes, self.planes, kernel_size=1,bias=False)
+        self.bn1 = nn.BatchNorm2d(self.planes)
         if stride == 2:
             self.conv2 = DWTForward()
         else:
-            self.conv2 = nn.Conv2d(self.planes, self.planes, kernel_size=3, stride=self.stride, padding=1
-
-                                   )
-        self.bn2 = nn.BatchNorm2d
-        self.conv3 = nn.Conv2d(self.planes, self.expansion * self.planes, kernel_size=1
-
-                               )
-        self.bn3 = nn.BatchNorm2d
+            self.conv2 = nn.Conv2d(self.planes, self.planes, kernel_size=3, stride=self.stride, padding=1,bias=False)
+        self.bn2 = nn.BatchNorm2d(self.planes)
+        self.conv3 = nn.Conv2d(self.planes, self.expansion * self.planes, kernel_size=1,bias=False)
+        self.bn3 = nn.BatchNorm2d(self.expansion * self.planes)
         self.relu = nn.ReLU()
         self.shortcut = nn.Sequential()
         if self.stride != 1 or self.in_planes != self.expansion * self.planes:
             self.shortcut = nn.Sequential(
-                nn.Conv2d(self.in_planes, self.expansion * self.planes, kernel_size=1, stride=self.stride
-                          ),
-                nn.BatchNorm2d(self.expansion * self.planes)
-            )
+                nn.Conv2d(self.in_planes, self.expansion * self.planes, kernel_size=1, stride=self.stride,bias=False),
+                nn.BatchNorm2d(self.expansion * self.planes))
 
     def forward(self, inputs, **kwargs):
         out = self.relu(self.bn1(self.conv1(inputs)))
@@ -224,11 +210,9 @@ class ResNet(nn.Module):
         super(ResNet, self).__init__()
         self.in_planes = 64
 
-        self.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1
-
-                               )
-        self.bn1 = nn.BatchNorm2d
-        self.relu = nn.ReLU()
+        self.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1)
+        self.bn1 = nn.BatchNorm2d(64)
+        self.relu = nn.ReLU(True)
         if half:
             self.layer1 = self._make_layer(block, 32, num_blocks[0], stride=1, regularize=regularize)
             self.layer2 = self._make_layer(block, 64, num_blocks[1], stride=2, regularize=regularize)
@@ -240,9 +224,9 @@ class ResNet(nn.Module):
             self.layer3 = self._make_layer(block, 256, num_blocks[2], stride=2, regularize=regularize)
             self.layer4 = self._make_layer(block, 512, num_blocks[3], stride=2, regularize=regularize)
 
-        self.pool = nn.AvgPool2d
+        self.pool = nn.AdaptiveAvgPool2d(1)
         self.linear = nn.Linear(self.in_planes, num_classes)
-        self.softamx = nn.Softmax()
+        self.softmax = nn.Softmax(dim=1)
 
     def _make_layer(self, block, planes, num_blocks, stride, regularize):
         strides = [stride] + [1] * (num_blocks - 1)
@@ -259,8 +243,9 @@ class ResNet(nn.Module):
         out = self.layer3(out)
         out = self.layer4(out)
         out = self.pool(out)
+        out = torch.flatten(out, start_dim=1)
         out = self.linear(out)
-        out = self.softamx(out)
+        out = self.softmax(out)
         return out
 
 
@@ -269,9 +254,8 @@ class ResNetBackbone(nn.Module):
         super(ResNetBackbone, self).__init__()
         self.in_planes = 64
         self.num_blocks = num_blocks
-        self.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1
-                               )
-        self.bn1 = nn.BatchNorm2d
+        self.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1)
+        self.bn1 = nn.BatchNorm2d(64)
         self.relu = nn.ReLU()
         if half:
             self.layer1 = self._make_layer(block, 32, self.num_blocks[0], stride=1, regularize=regularize)
