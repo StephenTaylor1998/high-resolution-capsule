@@ -3,8 +3,9 @@ from core.layers.layers_hinton import PrimaryCaps, DigitCaps, Mask, Length, Gene
 
 
 class Capsule(nn.Module):
-    def __init__(self, in_channels):
+    def __init__(self, in_channels, decoder=True):
         super(Capsule, self).__init__()
+        self.decoder = decoder
         self.conv = nn.Conv2d(in_channels, 256, kernel_size=9)
         self.bn = nn.BatchNorm2d(256)
         self.primary_caps = PrimaryCaps(256, 32, 8, 9, 2)
@@ -16,7 +17,10 @@ class Capsule(nn.Module):
         x = self.primary_caps(x)
         digit = self.digit_caps(x)
         classes = self.length(digit)
-        return digit, classes
+        if self.decoder:
+            return digit, classes
+        else:
+            return classes
 
 
 class Model(nn.Module):
@@ -38,5 +42,9 @@ class Model(nn.Module):
         return classes, generate
 
 
-def capsule_hinton(in_channels, out_shape, mode='train'):
+def capsule_hinton(in_channels, out_shape, mode='train', **kwargs):
     return Model(in_channels, out_shape, mode)
+
+
+def capsule_hinton_without_docoder(in_channels=1, **kwargs):
+    return Capsule(in_channels, decoder=False)

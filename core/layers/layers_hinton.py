@@ -70,7 +70,11 @@ class DigitCaps(nn.Module):
 
         if self.routing:
             # Hinton's routing
-            b = torch.zeros(u.shape[:-1])[..., None]  # b shape=(None,H*W*input_C,C,1) -> (None,i,j,1)
+            # todo: fix bugs here(cuda runtime error while using single-GPU)
+            # b shape=(None,H*W*input_C,C,1) -> (None,i,j,1)
+            b = torch.zeros(u.shape[:-1], device=torch.device(u.device), requires_grad=False)[..., None]
+            print(u.device)
+            print(b.device, '\n')
             for r in range(self.routing):
                 c = F.softmax(b, dim=2)  # c shape=(None,H*W*input_C,C,1) -> (None,i,j,1)
                 s = torch.sum(torch.multiply(u, c), dim=1, keepdim=True)  # s shape=(None,1,C,L)

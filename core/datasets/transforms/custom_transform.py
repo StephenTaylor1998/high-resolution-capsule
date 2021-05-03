@@ -60,11 +60,9 @@ TinyImageNetTestTransform = transforms.Compose([
 
 # tiny-imagenet examples
 MNISTTrainTransform = transforms.Compose([
-    transforms.RandomResizedCrop(28),
-    transforms.RandomHorizontalFlip(),
-    # you may remove this line, it's a test
-    transforms.RandomVerticalFlip(),
-    # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    transforms.RandomRotation(30, center=(14, 14)),
+    # transforms.RandomPerspective(),
+    transforms.RandomResizedCrop(28, (0.85, 1.15), (0.8, 1.2)),
     transforms.ToTensor(),
     transforms.Normalize(mean=[0.456], std=[0.225]),
 ])

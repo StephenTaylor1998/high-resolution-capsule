@@ -16,8 +16,9 @@ class CBN(nn.Module):
 
 
 class Capsule(nn.Module):
-    def __init__(self, in_channels):
+    def __init__(self, in_channels, decoder=True):
         super(Capsule, self).__init__()
+        self.decoder = decoder
         self.cbn_list = nn.Sequential(
             CBN(in_channels, 32, 5),
             CBN(32, 64, 3),
@@ -31,10 +32,12 @@ class Capsule(nn.Module):
     def forward(self, x):
         x = self.cbn_list(x)
         x = self.primary_caps(x)
-
         digit = self.digit_caps(x)
         classes = self.length(digit)
-        return digit, classes
+        if self.decoder:
+            return digit, classes
+        else:
+            return classes
 
 
 class Model(nn.Module):
@@ -56,5 +59,9 @@ class Model(nn.Module):
         return classes, generate
 
 
-def capsule_efficient(in_channels, out_shape, mode='train'):
+def capsule_efficient(in_channels, out_shape, mode='train', **kwargs):
     return Model(in_channels, out_shape, mode)
+
+
+def capsule_efficient_without_docoder(in_channels=1, **kwargs):
+    return Capsule(in_channels, decoder=False)

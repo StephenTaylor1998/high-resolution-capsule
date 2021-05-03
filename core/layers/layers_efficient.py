@@ -28,7 +28,6 @@ class PrimaryCaps(nn.Module):
         x = self.conv(x)
         x = torch.reshape(x, (x.shape[0], self.num_capsule, self.capsule_length))
         x = self.squash(x)
-        print(x.shape)
         x = x.permute((0, 1, 2)) if self.out_capsule_last else x
         return x
 
@@ -42,11 +41,13 @@ class FCCaps(nn.Module):
         kernel = nn.init.xavier_uniform_(kernel) if init_mode == 'glorot' else nn.init.kaiming_uniform_(kernel)
         self.weight = nn.Parameter(kernel)
         self.biases = nn.Parameter(torch.zeros((out_num_capsule, in_num_capsule, 1), dtype=torch.float32))
+        self.factor = nn.Parameter(torch.from_numpy(np.array([self.out_capsule_length], dtype=np.float32)),
+                                   requires_grad=False)
 
     def forward(self, x):
         u = torch.einsum('...ji,kjiz->...kjz', x, self.weight)  # u shape=(None,N,H*W*input_N,D)
         c = torch.einsum('...ij,...kj->...i', u, u)[..., None]  # b shape=(None,N,H*W*input_N,1) -> (None,j,i,1)
-        c = c / torch.sqrt(torch.from_numpy(np.array([self.out_capsule_length], dtype=np.float32)))
+        c = c / torch.sqrt(self.factor)
         c = F.softmax(c, dim=1)  # c shape=(None,N,H*W*input_N,1) -> (None,j,i,1)
         c = c + self.biases
         s = torch.sum(torch.multiply(u, c), dim=-2)  # s shape=(None,N,D)
