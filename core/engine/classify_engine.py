@@ -8,9 +8,9 @@ import torch.optim
 import torch.utils.data
 import torch.utils.data.distributed
 from core import models
-from core.datasets.data.image_folder import classify_train_dataset
-from core.datasets.data.image_folder import classify_val_dataset
-from core.datasets.data.image_folder import classify_test_dataset
+from core.datasets.data.image_folder import train_dataset
+from core.datasets.data.image_folder import val_dataset
+from core.datasets.data.image_folder import test_dataset
 from core.engine.base import validate, adjust_learning_rate, train, save_checkpoint
 from core.utils.copy_weights import copy_weights
 from core.utils.resume import resume_from_checkpoint
@@ -84,21 +84,21 @@ def main_worker(gpu, ngpus_per_node, args):
     # testdir = os.path.join(args.data, 'test')
 
     # train data loader is here, distribute is support #
-    train_dataset = classify_train_dataset(args.data)
+    train_data = train_dataset(args.data)
 
     if args.distributed:
-        train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset)
+        train_sampler = torch.utils.data.distributed.DistributedSampler(train_data)
     else:
         train_sampler = None
 
     train_loader = torch.utils.data.DataLoader(
-        train_dataset, batch_size=args.batch_size, shuffle=(train_sampler is None),
+        train_data, batch_size=args.batch_size, shuffle=(train_sampler is None),
         num_workers=args.workers, pin_memory=True, sampler=train_sampler)
     # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ #
 
     # val data loader is here #
     val_loader = torch.utils.data.DataLoader(
-        classify_val_dataset(args.data),
+        val_dataset(args.data),
         batch_size=args.batch_size, shuffle=False,
         num_workers=args.workers, pin_memory=True)
     # ^^^^^^^^^^^^^^^^^^^^^^^ #
@@ -108,7 +108,7 @@ def main_worker(gpu, ngpus_per_node, args):
 
     if args.test:
         test_loader = torch.utils.data.DataLoader(
-            classify_test_dataset(args.data),
+            test_dataset(args.data),
             batch_size=args.batch_size, shuffle=False,
             num_workers=args.workers, pin_memory=True)
 
