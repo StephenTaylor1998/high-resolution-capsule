@@ -17,15 +17,15 @@ cifar_transform_test = transforms.Compose([
 ])
 
 
-def classify_train_dataset(data_dir, transform=cifar_transform_train, **kwargs):
+def train_dataset(data_dir, transform=cifar_transform_train, **kwargs):
     return datasets.CIFAR10(root=data_dir, train=True, transform=transform, download=True, **kwargs)
 
 
 # val dataset example for tiny-image-net
-def classify_val_dataset(data_dir, transform=cifar_transform_test, **kwargs):
+def val_dataset(data_dir, transform=cifar_transform_test, **kwargs):
     return datasets.CIFAR10(root=data_dir, train=False, transform=transform, download=True, **kwargs)
 
 
 # test dataset example for tiny-image-net
-def classify_test_dataset(data_dir, transform=cifar_transform_test, **kwargs):
+def test_dataset(data_dir, transform=cifar_transform_test, **kwargs):
     return datasets.CIFAR10(root=data_dir, train=False, transform=transform, download=True, **kwargs)

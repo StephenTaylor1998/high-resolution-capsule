@@ -43,7 +43,6 @@ def main():
 
     ngpus_per_node = torch.cuda.device_count()
 
-
     model = b7()
     model.cuda()
 
