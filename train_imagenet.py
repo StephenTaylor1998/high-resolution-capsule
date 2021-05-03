@@ -9,7 +9,7 @@ import torch.optim
 import torch.utils.data
 import torch.utils.data.distributed
 
-from core.engine.imagenet import main_worker
+from core.engine.imagenet_engine import main_worker
 from core.utils.argparse import arg_parse
 
 parser = arg_parse()
