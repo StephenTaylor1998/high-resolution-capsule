@@ -104,28 +104,29 @@ class Mask(nn.Module):
     def forward(self, x):
         if type(x) is list:
             x, mask = x
+
         else:
-            x = torch.sqrt(torch.sum(torch.square(x), -1))
-            mask = F.one_hot(torch.argmax(x, 1), num_classes=x.shape[1])
+            length = torch.sqrt(torch.sum(torch.square(x), -1))
+            mask = F.one_hot(torch.argmax(length, -1), num_classes=length.shape[1])
 
         masked = torch.flatten(x * torch.unsqueeze(mask, -1), 1)
         return masked
 
 
 class Generator(nn.Module):
-    def __init__(self, input_shape):
+    def __init__(self, out_shape):
         super(Generator, self).__init__()
-        self.input_shape = input_shape
+        self.out_shape = out_shape
         self.l1 = nn.Linear(160, 512)
         self.a1 = nn.ReLU(True)
         self.l2 = nn.Linear(512, 1024)
         self.a2 = nn.ReLU(True)
-        self.l3 = nn.Linear(1024, np.prod(input_shape))
+        self.l3 = nn.Linear(1024, np.prod(out_shape))
         self.a3 = nn.Sigmoid()
 
     def forward(self, x):
         x = self.a1(self.l1(x))
         x = self.a2(self.l2(x))
         x = self.a3(self.l3(x))
-        x = torch.reshape(x, self.input_shape)
+        x = torch.reshape(x, self.out_shape)
         return x
