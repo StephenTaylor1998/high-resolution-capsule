@@ -70,7 +70,11 @@ class DigitCaps(nn.Module):
 
         if self.routing:
             # Hinton's routing
-            b = torch.zeros(u.shape[:-1])[..., None]  # b shape=(None,H*W*input_C,C,1) -> (None,i,j,1)
+            # todo: fix bugs here(cuda runtime error while using single-GPU)
+            # b shape=(None,H*W*input_C,C,1) -> (None,i,j,1)
+            b = torch.zeros(u.shape[:-1], device=torch.device(u.device), requires_grad=False)[..., None]
+            print(u.device)
+            print(b.device, '\n')
             for r in range(self.routing):
                 c = F.softmax(b, dim=2)  # c shape=(None,H*W*input_C,C,1) -> (None,i,j,1)
                 s = torch.sum(torch.multiply(u, c), dim=1, keepdim=True)  # s shape=(None,1,C,L)
@@ -104,29 +108,29 @@ class Mask(nn.Module):
     def forward(self, x):
         if type(x) is list:
             x, mask = x
+
         else:
-            x = torch.sqrt(torch.sum(torch.square(x), -1))
-            indices = torch.argmax(x, 1)
-            mask = F.one_hot(indices, num_classes=x.shape[1])
+            length = torch.sqrt(torch.sum(torch.square(x), -1))
+            mask = F.one_hot(torch.argmax(length, -1), num_classes=length.shape[1])
 
         masked = torch.flatten(x * torch.unsqueeze(mask, -1), 1)
         return masked
 
 
 class Generator(nn.Module):
-    def __init__(self, input_shape):
+    def __init__(self, out_shape):
         super(Generator, self).__init__()
-        self.input_shape = input_shape
+        self.out_shape = out_shape
         self.l1 = nn.Linear(160, 512)
         self.a1 = nn.ReLU(True)
         self.l2 = nn.Linear(512, 1024)
         self.a2 = nn.ReLU(True)
-        self.l3 = nn.Linear(1024, np.prod(input_shape))
+        self.l3 = nn.Linear(1024, np.prod(out_shape))
         self.a3 = nn.Sigmoid()
 
     def forward(self, x):
         x = self.a1(self.l1(x))
         x = self.a2(self.l2(x))
         x = self.a3(self.l3(x))
-        x = torch.reshape(x, self.input_shape)
+        x = torch.reshape(x, self.out_shape)
         return x
