@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
-
-
+from core.layers.transforms.dwt import DWTForward
 class BasicBlock(nn.Module):
     expansion = 1
 
@@ -74,7 +73,7 @@ class TinyBlockDWT(nn.Module):
         self.planes = planes
         self.stride = stride
         if self.stride == 2:
-            self.conv1 = DWT()
+            self.conv1 = DWTForward()
         else:
             self.conv1 = nn.Conv2d(self.in_planes, self.planes / 2, kernel_size=3, stride=1, padding=1
 
@@ -115,7 +114,7 @@ class TinyBottleDWT(nn.Module):
                                )
         self.bn1 = nn.BatchNorm2d
         if stride == 2:
-            self.conv2 = DWT()
+            self.conv2 = DWTForward()
         else:
             self.conv2 = nn.Conv2d(self.planes, self.planes / 2, kernel_size=3, stride=self.stride, padding=1
                                    )
@@ -152,7 +151,7 @@ class BasicBlockDWT(nn.Module):
         self.planes = planes
         self.stride = stride
         if self.stride == 2:
-            self.conv1 = DWT()
+            self.conv1 = DWTForward()
         else:
             self.conv1 = nn.Conv2d(self.in_planes, self.planes, kernel_size=3, stride=1, padding=1)
 
@@ -192,7 +191,7 @@ class BottleneckDWT(nn.Module):
                                )
         self.bn1 = nn.BatchNorm2d
         if stride == 2:
-            self.conv2 = DWT()
+            self.conv2 = DWTForward()
         else:
             self.conv2 = nn.Conv2d(self.planes, self.planes, kernel_size=3, stride=self.stride, padding=1
 
