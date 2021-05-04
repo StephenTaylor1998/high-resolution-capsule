@@ -68,11 +68,11 @@ def main_worker(gpu, ngpus_per_node, args):
 
     adjust_learning_rate = get_scheduler_by_name(args.lr_scheduler)
 
-    # optimizer = torch.optim.SGD(model.parameters(), args.lr,
-    #                             momentum=args.momentum,
-    #                             weight_decay=args.weight_decay)
-    optimizer = torch.optim.Adam(model.parameters(), args.lr,
-                                 weight_decay=args.weight_decay)
+    optimizer = torch.optim.SGD(model.parameters(), args.lr,
+                                momentum=args.momentum,
+                                weight_decay=args.weight_decay)
+    # optimizer = torch.optim.Adam(model.parameters(), args.lr,
+    #                              weight_decay=args.weight_decay)
 
     # optionally resume from a checkpoint
     if args.resume:
