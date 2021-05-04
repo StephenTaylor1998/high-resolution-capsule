@@ -6,23 +6,23 @@ from core.layers.transforms.dwt import DWTForward
 class BasicBlock(nn.Module):
     expansion = 1
 
-    def __init__(self, in_planes, planes, stride=1, regularize=1e-4):
+    def __init__(self, in_planes, planes, stride=1, **kwargs):
         super(BasicBlock, self).__init__()
         self.in_planes = in_planes
         self.planes = planes
         self.stride = stride
-        self.conv1 = nn.Conv2d(self.in_planes, self.planes, kernel_size=3, stride=self.stride, padding=1,bias=False)
-        self.bn1 = nn.BatchNorm2d(self.planes)
-        self.conv2 = nn.Conv2d(self.planes, self.planes, kernel_size=3, stride=1, padding=1,bias=False)
+        self.conv1 = nn.Conv2d(self.in_planes, planes, kernel_size=3, stride=stride, padding=1, bias=False)
+        self.bn1 = nn.BatchNorm2d(planes)
+        self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=1, padding=1, bias=False)
         self.bn2 = nn.BatchNorm2d(self.planes)
         self.relu = nn.ReLU()
         self.shortcut = nn.Sequential()
         if self.stride != 1 or self.in_planes != self.expansion * self.planes:
             self.shortcut = nn.Sequential(
-                nn.Conv2d(self.in_planes, self.expansion * self.planes, kernel_size=1, stride=self.stride,bias=False),
+                nn.Conv2d(self.in_planes, self.expansion * self.planes, kernel_size=1, stride=self.stride, bias=False),
                 nn.BatchNorm2d(self.expansion * self.planes))
 
-    def forward(self, inputs, **kwargs):
+    def forward(self, inputs):
         out = self.relu(self.bn1(self.conv1(inputs)))
         out = self.bn2(self.conv2(out))
         out += self.shortcut(inputs)
@@ -33,15 +33,14 @@ class BasicBlock(nn.Module):
 class Bottleneck(nn.Module):
     expansion = 4
 
-    def __init__(self, in_planes, planes, stride=1, regularize=1e-4):
+    def __init__(self, in_planes, planes, stride=1, **kwargs):
         super(Bottleneck, self).__init__()
         self.in_planes = in_planes
         self.planes = planes
         self.stride = stride
-
-        self.conv1 = nn.Conv2d(self.in_planes, self.planes, kernel_size=1,bias=False)
+        self.conv1 = nn.Conv2d(self.in_planes, self.planes, kernel_size=1, bias=False)
         self.bn1 = nn.BatchNorm2d(self.planes)
-        self.conv2 = nn.Conv2d(self.planes, self.planes, kernel_size=3, stride=self.stride, padding=1,bias=False)
+        self.conv2 = nn.Conv2d(self.planes, self.planes, kernel_size=3, stride=self.stride, padding=1, bias=False)
         self.bn2 = nn.BatchNorm2d(self.planes)
         self.conv3 = nn.Conv2d(self.planes, self.expansion * self.planes, kernel_size=1)
         self.bn3 = nn.BatchNorm2d(self.expansion * self.planes)
@@ -49,11 +48,11 @@ class Bottleneck(nn.Module):
         self.shortcut = nn.Sequential()
         if self.stride != 1 or self.in_planes != self.expansion * self.planes:
             self.shortcut = nn.Sequential(
-                nn.Conv2d(self.in_planes, self.expansion * self.planes, kernel_size=1, stride=self.stride,bias=False),
+                nn.Conv2d(self.in_planes, self.expansion * self.planes, kernel_size=1, stride=self.stride, bias=False),
                 nn.BatchNorm2d(self.expansion * self.planes)
             )
 
-    def forward(self, inputs, **kwargs):
+    def forward(self, inputs):
         out = self.relu(self.bn1(self.conv1(inputs)))
         out = self.relu(self.bn2(self.conv2(out)))
         out = self.bn3(self.conv3(out))
@@ -65,7 +64,7 @@ class Bottleneck(nn.Module):
 class TinyBlockDWT(nn.Module):
     expansion = 1
 
-    def __init__(self, in_planes, planes, stride=1, regularize=1e-4):
+    def __init__(self, in_planes, planes, stride=1):
         super(TinyBlockDWT, self).__init__()
         self.in_planes = in_planes
         self.planes = planes
@@ -73,19 +72,17 @@ class TinyBlockDWT(nn.Module):
         if self.stride == 2:
             self.conv1 = DWTForward()
         else:
-            self.conv1 = nn.Conv2d(self.in_planes, self.planes / 2, kernel_size=3, stride=1, padding=1,bias=False)
+            self.conv1 = nn.Conv2d(self.in_planes, self.planes / 2, kernel_size=3, stride=1, padding=1, bias=False)
 
         self.bn1 = nn.BatchNorm2d(self.planes / 2)
-        self.conv2 = nn.Conv2d(self.planes / 2, self.planes, kernel_size=1, stride=1, padding=1,bias=False)
+        self.conv2 = nn.Conv2d(self.planes / 2, self.planes, kernel_size=1, stride=1, padding=1, bias=False)
         self.bn2 = nn.BatchNorm2d(self.planes)
         self.relu = nn.ReLU()
         self.shortcut = nn.Sequential()
         if self.stride != 1 or self.in_planes != self.expansion * self.planes:
             self.shortcut = nn.Sequential(
-                nn.Conv2d(self.in_planes, self.expansion * self.planes, kernel_size=1, stride=self.stride,bias=False
-                          ),
+                nn.Conv2d(self.in_planes, self.expansion * self.planes, kernel_size=1, stride=self.stride, bias=False),
                 nn.BatchNorm2d(self.expansion * self.planes)
-
             )
 
     def forward(self, inputs, **kwargs):
@@ -99,37 +96,30 @@ class TinyBlockDWT(nn.Module):
 class TinyBottleDWT(nn.Module):
     expansion = 1
 
-    def __init__(self, in_planes, planes, stride=1, regularize=1e-4):
+    def __init__(self, in_planes, planes, stride=1):
         super(TinyBottleDWT, self).__init__()
         self.in_planes = in_planes
         self.planes = planes
         self.stride = stride
 
-        self.conv1 = nn.Conv2d(self.in_planes, self.planes, kernel_size=1,bias=False
-
-                               )
+        self.conv1 = nn.Conv2d(self.in_planes, self.planes, kernel_size=1, bias=False)
         self.bn1 = nn.BatchNorm2d(self.planes)
         if stride == 2:
             self.conv2 = DWTForward()
         else:
-            self.conv2 = nn.Conv2d(self.planes, self.planes / 2, kernel_size=3, stride=self.stride, padding=1,bias=False
-                                   )
+            self.conv2 = nn.Conv2d(self.planes, self.planes / 2, kernel_size=3, stride=stride, padding=1, bias=False)
         self.bn2 = nn.BatchNorm2d(self.planes / 2)
-        self.conv3 = nn.Conv2d(self.planes / 2, self.expansion * self.planes, kernel_size=1,bias=False
-
-                               )
+        self.conv3 = nn.Conv2d(self.planes / 2, self.expansion * self.planes, kernel_size=1, bias=False)
         self.bn3 = nn.BatchNorm2d(self.expansion * self.planes)
         self.relu = nn.ReLU()
         self.shortcut = nn.Sequential()
         if self.stride != 1 or self.in_planes != self.expansion * self.planes:
             self.shortcut = nn.Sequential(
-                nn.Conv2d(self.in_planes, self.expansion * self.planes, kernel_size=1, stride=self.stride,bias=False
-
-                          ),
+                nn.Conv2d(self.in_planes, self.expansion * self.planes, kernel_size=1, stride=stride, bias=False),
                 nn.BatchNorm2d(self.expansion * self.planes)
             )
 
-    def forward(self, inputs, **kwargs):
+    def forward(self, inputs):
         out = self.relu(self.bn1(self.conv1(inputs)))
         out = self.relu(self.bn2(self.conv2(out)))
         out = self.bn3(self.conv3(out))
@@ -141,7 +131,7 @@ class TinyBottleDWT(nn.Module):
 class BasicBlockDWT(nn.Module):
     expansion = 1
 
-    def __init__(self, in_planes, planes, stride=1, regularize=1e-4):
+    def __init__(self, in_planes, planes, stride=1):
         super(BasicBlockDWT, self).__init__()
         self.in_planes = in_planes
         self.planes = planes
@@ -152,18 +142,17 @@ class BasicBlockDWT(nn.Module):
             self.conv1 = nn.Conv2d(self.in_planes, self.planes, kernel_size=3, stride=1, padding=1, bias=False)
 
         self.bn1 = nn.BatchNorm2d(self.planes)
-        self.conv2 = nn.Conv2d(self.planes, self.planes, kernel_size=3, stride=1, padding=1,bias=False)
+        self.conv2 = nn.Conv2d(self.planes, self.planes, kernel_size=3, stride=1, padding=1, bias=False)
         self.bn2 = nn.BatchNorm2d(self.planes)
         self.relu = nn.ReLU()
         self.shortcut = nn.Sequential()
         if self.stride != 1 or self.in_planes != self.expansion * self.planes:
             self.shortcut = nn.Sequential(
-                nn.Conv2d(self.in_planes, self.expansion * self.planes, kernel_size=1, stride=self.stride,bias=False
-                          ),
+                nn.Conv2d(self.in_planes, self.expansion * self.planes, kernel_size=1, stride=self.stride, bias=False),
                 nn.BatchNorm2d(self.expansion * self.planes)
             )
 
-    def forward(self, inputs, **kwargs):
+    def forward(self, inputs):
         out = self.relu(self.bn1(self.conv1(inputs)))
         out = self.bn2(self.conv2(out))
         out += self.shortcut(inputs)
@@ -174,29 +163,29 @@ class BasicBlockDWT(nn.Module):
 class BottleneckDWT(nn.Module):
     expansion = 4
 
-    def __init__(self, in_planes, planes, stride=1, regularize=1e-4):
+    def __init__(self, in_planes, planes, stride=1):
         super(BottleneckDWT, self).__init__()
         self.in_planes = in_planes
         self.planes = planes
         self.stride = stride
-
-        self.conv1 = nn.Conv2d(self.in_planes, self.planes, kernel_size=1,bias=False)
+        self.conv1 = nn.Conv2d(self.in_planes, self.planes, kernel_size=1, bias=False)
         self.bn1 = nn.BatchNorm2d(self.planes)
         if stride == 2:
             self.conv2 = DWTForward()
         else:
-            self.conv2 = nn.Conv2d(self.planes, self.planes, kernel_size=3, stride=self.stride, padding=1,bias=False)
+            self.conv2 = nn.Conv2d(self.planes, self.planes, kernel_size=3, stride=self.stride, padding=1, bias=False)
         self.bn2 = nn.BatchNorm2d(self.planes)
-        self.conv3 = nn.Conv2d(self.planes, self.expansion * self.planes, kernel_size=1,bias=False)
+        self.conv3 = nn.Conv2d(self.planes, self.expansion * self.planes, kernel_size=1, bias=False)
         self.bn3 = nn.BatchNorm2d(self.expansion * self.planes)
         self.relu = nn.ReLU()
         self.shortcut = nn.Sequential()
         if self.stride != 1 or self.in_planes != self.expansion * self.planes:
             self.shortcut = nn.Sequential(
-                nn.Conv2d(self.in_planes, self.expansion * self.planes, kernel_size=1, stride=self.stride,bias=False),
-                nn.BatchNorm2d(self.expansion * self.planes))
+                nn.Conv2d(self.in_planes, self.expansion * self.planes, kernel_size=1, stride=self.stride, bias=False),
+                nn.BatchNorm2d(self.expansion * self.planes)
+            )
 
-    def forward(self, inputs, **kwargs):
+    def forward(self, inputs):
         out = self.relu(self.bn1(self.conv1(inputs)))
         out = self.relu(self.bn2(self.conv2(out)))
         out = self.bn3(self.conv3(out))
@@ -209,7 +198,6 @@ class ResNet(nn.Module):
     def __init__(self, block, num_blocks, num_classes=10, half=True, regularize=1e-4):
         super(ResNet, self).__init__()
         self.in_planes = 64
-
         self.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1)
         self.bn1 = nn.BatchNorm2d(64)
         self.relu = nn.ReLU(True)
@@ -236,7 +224,7 @@ class ResNet(nn.Module):
             self.in_planes = planes * block.expansion
         return nn.Sequential(*layer_list)
 
-    def forward(self, inputs, training=None, mask=None):
+    def forward(self, inputs):
         out = self.relu(self.bn1(self.conv1(inputs)))
         out = self.layer1(out)
         out = self.layer2(out)
@@ -276,9 +264,8 @@ class ResNetBackbone(nn.Module):
             self.in_planes = planes * block.expansion
         return nn.Sequential(*layer_list)
 
-    def forward(self, inputs, training=None, mask=None):
+    def forward(self, inputs):
         out = self.relu(self.bn1(self.conv1(inputs)))
-
         out = self.layer1(out)
         out = self.layer2(out)
         out = self.layer3(out)
@@ -289,7 +276,6 @@ class ResNetBackbone(nn.Module):
 def resnet18_cifar(block=BasicBlock, num_blocks=None, num_classes=10, half=True, backbone=False):
     if num_blocks is None:
         num_blocks = [2, 2, 2, 2]
-
     if backbone:
         return ResNetBackbone(block, num_blocks, half=half)
     else:
