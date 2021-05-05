@@ -44,9 +44,34 @@ class Model(nn.Module):
         return classes, generate
 
 
-def capsule_hinton(in_channels, out_shape, mode='train', **kwargs):
-    return Model(in_channels, out_shape, mode)
+def capsule_hinton_nmist(num_classes=10, args=None, **kwargs):
+    in_shape = (1, 28, 28) if args.in_shape is None else args.in_shape
+    mode = 'train' if args.mode is None else args.mode
+    return Model(in_shape, num_classes, mode)
 
 
-def capsule_hinton_without_docoder(in_channels=1, **kwargs):
-    return Capsule(in_channels, decoder=False)
+def capsule_hinton_smallnorb(num_classes=5, args=None, **kwargs):
+    in_shape = (2, 32, 32) if args.in_shape is None else args.in_shape
+    mode = 'train' if args.mode is None else args.mode
+    return Model(in_shape, num_classes, mode)
+
+
+def capsule_hinton_cifar(num_classes=10, args=None, **kwargs):
+    in_shape = (3, 32, 32) if args.in_shape is None else args.in_shape
+    mode = 'train' if args.mode is None else args.mode
+    return Model(in_shape, num_classes, mode)
+
+
+def capsule_hinton_without_docoder_mnist(num_classes=10, args=None, **kwargs):
+    in_shape = (1, 28, 28) if args.in_shape is None else args.in_shape
+    return Capsule(in_shape, num_classes, decoder=False)
+
+
+def capsule_hinton_without_docoder_smallnorb(num_classes=5, args=None, **kwargs):
+    in_shape = (2, 32, 32) if args.in_shape is None else args.in_shape
+    return Capsule(in_shape, num_classes, decoder=False)
+
+
+def capsule_hinton_without_docoder_cifar(num_classes=10, args=None, **kwargs):
+    in_shape = (3, 32, 32) if args.in_shape is None else args.in_shape
+    return Capsule(in_shape, num_classes, decoder=False)
