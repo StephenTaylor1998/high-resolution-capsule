@@ -42,25 +42,35 @@ class Model(nn.Module):
         return classes, generate
 
 
-def capsule_efficient_mnist(num_classes=10, in_shape=(1, 28, 28), mode='train', **kwargs):
+def capsule_efficient_mnist(num_classes=10, args=None, **kwargs):
+    in_shape = (1, 28, 28) if args.in_shape is None else args.in_shape
+    mode = 'train' if args.mode is None else args.mode
     return Model(in_shape, num_classes, mode)
 
 
-def capsule_efficient_smallnorb(num_classes=5, in_shape=(2, 32, 32), mode='train', **kwargs):
+def capsule_efficient_smallnorb(num_classes=5, args=None, **kwargs):
+    in_shape = (2, 32, 32) if args.in_shape is None else args.in_shape
+    mode = 'train' if args.mode is None else args.mode
     return Model(in_shape, num_classes, mode)
 
 
-def capsule_efficient_cifar(num_classes=10, in_shape=(3, 32, 32), mode='train', **kwargs):
+def capsule_efficient_cifar(num_classes=10, args=None, **kwargs):
+    in_shape = (3, 32, 32) if args.in_shape is None else args.in_shape
+    mode = 'train' if args.mode is None else args.mode
     return Model(in_shape, num_classes, mode)
 
 
-def capsule_efficient_without_docoder_mnist(num_classes=10, in_shape=(1, 28, 28), **kwargs):
+def capsule_efficient_without_docoder_mnist(num_classes=10, args=None, **kwargs):
+    in_shape = (1, 28, 28) if args.in_shape is None else args.in_shape
     return Capsule(in_shape, num_classes, decoder=False)
 
 
-def capsule_efficient_without_docoder_smallnorb(num_classes=5, in_shape=(2, 32, 32), **kwargs):
+def capsule_efficient_without_docoder_smallnorb(num_classes=5, args=None, **kwargs):
+    in_shape = (2, 32, 32) if args.in_shape is None else args.in_shape
+    mode = 'train' if args.mode is None else args.mode
     return Capsule(in_shape, num_classes, decoder=False)
 
 
-def capsule_efficient_without_docoder_cifar(num_classes=10, in_shape=(3, 32, 32), **kwargs):
+def capsule_efficient_without_docoder_cifar(num_classes=10, args=None, **kwargs):
+    in_shape = (3, 32, 32) if args.in_shape is None else args.in_shape
     return Capsule(in_shape, num_classes, decoder=False)
