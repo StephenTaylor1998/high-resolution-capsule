@@ -2,7 +2,7 @@
 import torch
 import torch.nn as nn
 from core.layers.transforms.dwt import DWTForward
-from core.layers.gate_torch import DynamicGate, GumbelGate
+from core.layers.gate_torch import DynamicGate
 
 
 class BasicBlock(nn.Module):
@@ -336,7 +336,7 @@ class ResNetBackbone(nn.Module):
         return out
 
 
-def resnet18_cifar(block=BasicBlock, num_blocks=None, num_classes=10, half=True, backbone=False):
+def resnet18_cifar(block=BasicBlock, num_blocks=None, num_classes=10, half=False, backbone=False):
     if num_blocks is None:
         num_blocks = [2, 2, 2, 2]
     if backbone:
@@ -345,7 +345,7 @@ def resnet18_cifar(block=BasicBlock, num_blocks=None, num_classes=10, half=True,
         return ResNet(block, num_blocks, num_classes=num_classes, half=half)
 
 
-def resnet34_cifar(block=BasicBlock, num_blocks=None, num_classes=10, half=True, backbone=False):
+def resnet34_cifar(block=BasicBlock, num_blocks=None, num_classes=10, half=False, backbone=False):
     if num_blocks is None:
         num_blocks = [3, 4, 6, 3]
     if backbone:
@@ -354,7 +354,7 @@ def resnet34_cifar(block=BasicBlock, num_blocks=None, num_classes=10, half=True,
         return ResNet(block, num_blocks, num_classes=num_classes, half=half)
 
 
-def resnet50_cifar(block=Bottleneck, num_blocks=None, num_classes=10, half=True, backbone=False):
+def resnet50_cifar(block=Bottleneck, num_blocks=None, num_classes=10, half=False, backbone=False):
     if num_blocks is None:
         num_blocks = [3, 4, 6, 3]
     if backbone:
@@ -363,25 +363,7 @@ def resnet50_cifar(block=Bottleneck, num_blocks=None, num_classes=10, half=True,
         return ResNet(block, num_blocks, num_classes=num_classes, half=half)
 
 
-def resnet101_cifar(block=Bottleneck, num_blocks=None, num_classes=10, half=True, backbone=False):
-    if num_blocks is None:
-        num_blocks = [3, 4, 23, 3]
-    if backbone:
-        return ResNetBackbone(block, num_blocks, half=half)
-    else:
-        return ResNet(block, num_blocks, num_classes=num_classes, half=half)
-
-
-def resnet152_cifar(block=Bottleneck, num_blocks=None, num_classes=10, half=True, backbone=False):
-    if num_blocks is None:
-        num_blocks = [3, 8, 36, 3]
-    if backbone:
-        return ResNetBackbone(block, num_blocks, half=half)
-    else:
-        return ResNet(block, num_blocks, num_classes=num_classes, half=half)
-
-
-def resnet18_cifar_dwt_half(block=BasicBlockDWT, num_blocks=None, num_classes=10, half=True, backbone=False):
+def resnet18_dwt_half(block=BasicBlockDWT, num_blocks=None, num_classes=10, half=True, backbone=False):
     if num_blocks is None:
         num_blocks = [2, 2, 2, 2]
     if backbone:
@@ -390,7 +372,7 @@ def resnet18_cifar_dwt_half(block=BasicBlockDWT, num_blocks=None, num_classes=10
         return ResNet(block, num_blocks, num_classes=num_classes, half=half)
 
 
-def resnet34_cifar_dwt_half(block=BasicBlockDWT, num_blocks=None, num_classes=10, half=True, backbone=False):
+def resnet34_dwt_half(block=BasicBlockDWT, num_blocks=None, num_classes=10, half=True, backbone=False):
     if num_blocks is None:
         num_blocks = [3, 4, 6, 3]
     if backbone:
@@ -399,7 +381,7 @@ def resnet34_cifar_dwt_half(block=BasicBlockDWT, num_blocks=None, num_classes=10
         return ResNet(block, num_blocks, num_classes=num_classes, half=half)
 
 
-def resnet50_cifar_dwt_half(block=BottleneckDWT, num_blocks=None, num_classes=10, half=True, backbone=False):
+def resnet50_dwt_half(block=BottleneckDWT, num_blocks=None, num_classes=10, half=True, backbone=False):
     if num_blocks is None:
         num_blocks = [3, 4, 6, 3]
     if backbone:
@@ -408,7 +390,7 @@ def resnet50_cifar_dwt_half(block=BottleneckDWT, num_blocks=None, num_classes=10
         return ResNet(block, num_blocks, num_classes=num_classes, half=half)
 
 
-def resnet18_cifar_dwt_tiny_half(block=TinyBlockDWT, num_blocks=None, num_classes=10, half=True, backbone=False):
+def resnet18_dwt_tiny(block=TinyBlockDWT, num_blocks=None, num_classes=10, half=False, backbone=False):
     if num_blocks is None:
         num_blocks = [2, 2, 2, 2]
     if backbone:
@@ -417,7 +399,7 @@ def resnet18_cifar_dwt_tiny_half(block=TinyBlockDWT, num_blocks=None, num_classe
         return ResNet(block, num_blocks, num_classes=num_classes, half=half)
 
 
-def resnet34_cifar_dwt_tiny_half(block=TinyBlockDWT, num_blocks=None, num_classes=10, half=True, backbone=False):
+def resnet34_dwt_tiny(block=TinyBlockDWT, num_blocks=None, num_classes=10, half=False, backbone=False):
     if num_blocks is None:
         num_blocks = [3, 4, 6, 3]
     if backbone:
@@ -426,7 +408,7 @@ def resnet34_cifar_dwt_tiny_half(block=TinyBlockDWT, num_blocks=None, num_classe
         return ResNet(block, num_blocks, num_classes=num_classes, half=half)
 
 
-def resnet50_cifar_dwt_tiny_half(block=TinyBottleDWT, num_blocks=None, num_classes=10, half=True, backbone=False):
+def resnet50_dwt_tiny(block=TinyBottleDWT, num_blocks=None, num_classes=10, half=False, backbone=False):
     if num_blocks is None:
         num_blocks = [3, 4, 6, 3]
     if backbone:
@@ -435,7 +417,7 @@ def resnet50_cifar_dwt_tiny_half(block=TinyBottleDWT, num_blocks=None, num_class
         return ResNet(block, num_blocks, num_classes=num_classes, half=half)
 
 
-def resnet18_cifar_dwt_tiny(block=TinyBlockDWT, num_blocks=None, num_classes=10, half=False, backbone=False):
+def resnet18_dwt_tiny_half(block=TinyBlockDWT, num_blocks=None, num_classes=10, half=True, backbone=False):
     if num_blocks is None:
         num_blocks = [2, 2, 2, 2]
     if backbone:
@@ -444,7 +426,7 @@ def resnet18_cifar_dwt_tiny(block=TinyBlockDWT, num_blocks=None, num_classes=10,
         return ResNet(block, num_blocks, num_classes=num_classes, half=half)
 
 
-def resnet34_cifar_dwt_tiny(block=TinyBlockDWT, num_blocks=None, num_classes=10, half=False, backbone=False):
+def resnet34_dwt_tiny_half(block=TinyBlockDWT, num_blocks=None, num_classes=10, half=True, backbone=False):
     if num_blocks is None:
         num_blocks = [3, 4, 6, 3]
     if backbone:
@@ -453,7 +435,7 @@ def resnet34_cifar_dwt_tiny(block=TinyBlockDWT, num_blocks=None, num_classes=10,
         return ResNet(block, num_blocks, num_classes=num_classes, half=half)
 
 
-def resnet50_cifar_dwt_tiny(block=TinyBottleDWT, num_blocks=None, num_classes=10, half=False, backbone=False):
+def resnet50_dwt_tiny_half(block=TinyBottleDWT, num_blocks=None, num_classes=10, half=True, backbone=False):
     if num_blocks is None:
         num_blocks = [3, 4, 6, 3]
     if backbone:
