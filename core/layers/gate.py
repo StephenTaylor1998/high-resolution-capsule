@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from .gumbel_torch import GumbleSoftmax
+from .gumbel import GumbleSoftmax
 
 
 class GumbelGate(nn.Module):
