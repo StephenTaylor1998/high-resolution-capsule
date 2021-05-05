@@ -3,13 +3,15 @@ from core.layers.layers_hinton import PrimaryCaps, DigitCaps, Mask, Length, Gene
 
 
 class Capsule(nn.Module):
-    def __init__(self, in_channels, decoder=True):
+    def __init__(self, in_shape, num_classes, decoder=True):
         super(Capsule, self).__init__()
         self.decoder = decoder
-        self.conv = nn.Conv2d(in_channels, 256, kernel_size=9)
+        self.conv = nn.Conv2d(in_shape[0], 256, kernel_size=9)
         self.bn = nn.BatchNorm2d(256)
         self.primary_caps = PrimaryCaps(256, 32, 8, 9, 2)
-        self.digit_caps = DigitCaps(6, 6, 32, 8, 10, 16, routing=3)
+        h = (in_shape[2] - 9 + 1 - 9 + 1)//2
+        w = (in_shape[3] - 9 + 1 - 9 + 1)//2
+        self.digit_caps = DigitCaps(h, w, 32, 8, num_classes, 16, routing=3)
         self.length = Length()
 
     def forward(self, x):

@@ -10,14 +10,15 @@ from core.layers.vb_routing import VariationalBayesRouting2d
 class CapsuleNet(nn.Module):
     """ Example: Simple 3 layer CapsNet """
 
-    def __init__(self, args):
+    def __init__(self, arch, n_classes, n_channels, pose_dim=4, routing_iter=3):
         super(CapsuleNet, self).__init__()
-
-        self.P = args.pose_dim
+        self.P = pose_dim
         self.PP = int(np.max([2, self.P * self.P]))
-        self.A, self.B, self.C, self.D = args.arch[:-1]
-        self.n_classes = args.n_classes = args.arch[-1]
-        self.in_channels = args.n_channels
+        self.A, self.B, self.C, self.D = arch[:-1]
+        self.n_classes = n_classes
+        if arch[-1] != n_classes:
+            raise ValueError
+        self.in_channels = n_channels
 
         self.Conv_1 = nn.Conv2d(in_channels=self.in_channels, out_channels=self.A,
                                 kernel_size=5, stride=2, bias=False)
@@ -32,7 +33,7 @@ class CapsuleNet(nn.Module):
 
         self.ConvRouting_1 = VariationalBayesRouting2d(in_caps=self.B, out_caps=self.C,
                                                        kernel_size=3, stride=2, pose_dim=self.P,
-                                                       cov='diag', iter=args.routing_iter,
+                                                       cov='diag', iter=routing_iter,
                                                        alpha0=1., m0=torch.zeros(self.PP), kappa0=1.,
                                                        Psi0=torch.eye(self.PP), nu0=self.PP + 1)
 
@@ -41,7 +42,7 @@ class CapsuleNet(nn.Module):
 
         self.ConvRouting_2 = VariationalBayesRouting2d(in_caps=self.C, out_caps=self.D,
                                                        kernel_size=3, stride=1, pose_dim=self.P,
-                                                       cov='diag', iter=args.routing_iter,
+                                                       cov='diag', iter=routing_iter,
                                                        alpha0=1., m0=torch.zeros(self.PP), kappa0=1.,
                                                        Psi0=torch.eye(self.PP), nu0=self.PP + 1)
 
@@ -50,8 +51,7 @@ class CapsuleNet(nn.Module):
 
         self.ClassRouting = VariationalBayesRouting2d(in_caps=self.D, out_caps=self.n_classes,
                                                       kernel_size=4, stride=1, pose_dim=self.P,
-                                                      # adjust final kernel_size K depending on input H/W, for H=W=32, K=4.
-                                                      cov='diag', iter=args.routing_iter,
+                                                      cov='diag', iter=routing_iter,
                                                       alpha0=1., m0=torch.zeros(self.PP), kappa0=1.,
                                                       Psi0=torch.eye(self.PP), nu0=self.PP + 1, class_caps=True)
 
@@ -86,14 +86,16 @@ class CapsuleNet(nn.Module):
 class tinyCapsuleNet(nn.Module):
     """ Example: Simple 1 layer CapsNet """
 
-    def __init__(self, args):
+    def __init__(self, pose_dim, arch, n_classes, n_channels, routing_iter):
         super(tinyCapsuleNet, self).__init__()
 
-        self.P = args.pose_dim
+        self.P = pose_dim
         self.D = int(np.max([2, self.P * self.P]))
-        self.A, self.B = args.arch[0], args.arch[2]
-        self.n_classes = args.n_classes = args.arch[-1]
-        self.in_channels = args.n_channels
+        self.A, self.B = arch[0], arch[2]
+        self.n_classes = n_classes
+        if arch[-1] != n_classes:
+            raise ValueError
+        self.in_channels = n_channels
 
         self.Conv_1 = nn.Conv2d(in_channels=self.in_channels, out_channels=self.A,
                                 kernel_size=5, stride=2, bias=False)
@@ -109,7 +111,7 @@ class tinyCapsuleNet(nn.Module):
 
         self.ClassRouting = VariationalBayesRouting2d(in_caps=self.B, out_caps=self.n_classes,
                                                       kernel_size=6, stride=1, pose_dim=self.P,
-                                                      cov='diag', iter=args.routing_iter,
+                                                      cov='diag', iter=routing_iter,
                                                       alpha0=1., m0=torch.zeros(self.D), kappa0=1.,
                                                       Psi0=torch.eye(self.D), nu0=self.D + 1, class_caps=True)
 
@@ -127,3 +129,21 @@ class tinyCapsuleNet(nn.Module):
         yhat, v = self.ClassRouting(a, v)
 
         return yhat
+
+
+def capsule_vb_mnist(arch=None, n_classes=10, n_channels=2, pose_dim=4, routing_iter=3, **kwargs):
+    if arch is None:
+        arch = [64, 8, 16, 16, 10]
+    return CapsuleNet(arch, n_classes, n_channels, pose_dim, routing_iter)
+
+
+def capsule_vb_smallnorb(arch=None, n_classes=5, n_channels=2, pose_dim=4, routing_iter=3, **kwargs):
+    if arch is None:
+        arch = [64, 8, 16, 16, 5]
+    return CapsuleNet(arch, n_classes, n_channels, pose_dim, routing_iter)
+
+
+def capsule_vb_cifar(arch=None, n_classes=10, n_channels=2, pose_dim=4, routing_iter=3, **kwargs):
+    if arch is None:
+        arch = [64, 8, 16, 16, 10]
+    return CapsuleNet(arch, n_classes, n_channels, pose_dim, routing_iter)
