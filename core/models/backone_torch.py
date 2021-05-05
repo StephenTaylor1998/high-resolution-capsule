@@ -198,7 +198,7 @@ class ResNet(nn.Module):
     def __init__(self, block, num_blocks, num_classes=10, half=True, **kwargs):
         super(ResNet, self).__init__()
         self.in_planes = 64
-        self.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1)
+        self.conv1 = nn.Conv2d(2, 64, kernel_size=3, stride=1, padding=1)
         self.bn1 = nn.BatchNorm2d(64)
         self.relu = nn.ReLU(True)
         if half:
