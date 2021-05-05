@@ -31,6 +31,7 @@ class Capsule(nn.Module):
 
     def forward(self, x):
         x = self.cbn_list(x)
+        print(x.shape)
         x = self.primary_caps(x)
         digit = self.digit_caps(x)
         classes = self.length(digit)
@@ -59,9 +60,25 @@ class Model(nn.Module):
         return classes, generate
 
 
-def capsule_efficient(in_channels, out_shape, mode='train', **kwargs):
+def capsule_efficient_28x28x1(in_channels=1, out_shape=(1, 28, 28), mode='train', **kwargs):
     return Model(in_channels, out_shape, mode)
 
 
-def capsule_efficient_without_docoder(in_channels=1, **kwargs):
+def capsule_efficient_32x32x2(in_channels=2, out_shape=(2, 32, 32), mode='train', **kwargs):
+    return Model(in_channels, out_shape, mode)
+
+
+def capsule_efficient_32x32x3(in_channels=3, out_shape=(3, 32, 32), mode='train', **kwargs):
+    return Model(in_channels, out_shape, mode)
+
+
+def capsule_efficient_without_docoder_28x28x1(in_channels=1, **kwargs):
+    return Capsule(in_channels, decoder=False)
+
+
+def capsule_efficient_without_docoder_32x32x2(in_channels=2, **kwargs):
+    return Capsule(in_channels, decoder=False)
+
+
+def capsule_efficient_without_docoder_32x32x3(in_channels=3, **kwargs):
     return Capsule(in_channels, decoder=False)
