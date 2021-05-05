@@ -8,4 +8,4 @@ from torchvision.models import *
 # ------------------------------------ capsule ------------------------------------ #
 from .hinton import capsule_hinton, capsule_hinton_without_docoder
 from .efficient import capsule_efficient, capsule_efficient_without_docoder
-from .backone_torch import resnet18_cifar,resnet34_cifar,resnet50_cifar,resnet101_cifar,resnet152_cifar
+from .backone_torch import resnet18_cifar, resnet34_cifar, resnet50_cifar, resnet101_cifar, resnet152_cifar
