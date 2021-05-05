@@ -9,3 +9,6 @@ efficientnet_pytorch
 
 # if you want to use scripts in $(SourceRoot)/data/postprocess
 matplotlib
+
+# DWT support
+pywavelets

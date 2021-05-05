@@ -28,6 +28,7 @@ class PrimaryCaps(nn.Module):
         x = self.conv(x)
         x = torch.reshape(x, (x.shape[0], self.num_capsule, self.capsule_length))
         x = self.squash(x)
+        print(x.shape)
         x = x.permute((0, 1, 2)) if self.out_capsule_last else x
         return x
 
@@ -41,14 +42,17 @@ class FCCaps(nn.Module):
         kernel = nn.init.xavier_uniform_(kernel) if init_mode == 'glorot' else nn.init.kaiming_uniform_(kernel)
         self.weight = nn.Parameter(kernel)
         self.biases = nn.Parameter(torch.zeros((out_num_capsule, in_num_capsule, 1), dtype=torch.float32))
-        self.factor = nn.Parameter(torch.from_numpy(np.array([self.out_capsule_length], dtype=np.float32)),
-                                   requires_grad=False)
 
     def forward(self, x):
         u = torch.einsum('...ji,kjiz->...kjz', x, self.weight)  # u shape=(None,N,H*W*input_N,D)
+
         c = torch.einsum('...ij,...kj->...i', u, u)[..., None]  # b shape=(None,N,H*W*input_N,1) -> (None,j,i,1)
-        c = c / torch.sqrt(self.factor)
+
+        c = c / torch.sqrt(torch.from_numpy(np.array([self.out_capsule_length], dtype=np.float32)))
+        # c = c / torch.sqrt(torch.from_numpy(self.out_capsule_length))
         c = F.softmax(c, dim=1)  # c shape=(None,N,H*W*input_N,1) -> (None,j,i,1)
+        print("c", c.shape)
+        print("self.biases", self.biases.shape)
         c = c + self.biases
         s = torch.sum(torch.multiply(u, c), dim=-2)  # s shape=(None,N,D)
         v = Squash()(s)  # v shape=(None,N,D)
@@ -76,21 +80,21 @@ class Mask(nn.Module):
             else:
                 x, mask = x
         else:
-            length = torch.sqrt(torch.sum(torch.square(x), -1))
+            x = torch.sqrt(torch.sum(torch.square(x), -1))
             if double_mask:
-                mask1 = F.one_hot(torch.argmax(length, 1), num_classes=length.shape[1])
-                mask2 = F.one_hot(torch.argmax(length, 1), num_classes=length.shape[1])
+                mask1 = F.one_hot(torch.argmax(x, 1), num_classes=x.shape[1])
+                mask2 = F.one_hot(torch.argmax(x, 1), num_classes=x.shape[1])
 
             else:
 
-                mask = F.one_hot(torch.argmax(length, 1), num_classes=length.shape[1])
+                mask = F.one_hot(torch.argmax(x, 1), num_classes=x.shape[1])
 
         if double_mask:
             masked1 = torch.flatten(x * torch.unsqueeze(mask1, -1), 1)
             masked2 = torch.flatten(x * torch.unsqueeze(mask2, -1), 1)
             return masked1, masked2
-
         else:
+
             masked = torch.flatten(x * torch.unsqueeze(mask, -1), 1)
             return masked
 
@@ -114,52 +118,42 @@ class Generator(nn.Module):
         return x
 
 
-class CBN(nn.Module):
-    def __init__(self, in_channel, out_channel, kernel_size, stride=1):
-        super(CBN, self).__init__()
-        self.model = nn.Sequential(
-            nn.Conv2d(in_channel, out_channel, kernel_size, stride),
-            nn.ReLU(inplace=True),
-            nn.BatchNorm2d(out_channel)
-        )
+if __name__ == '__main__':
+    inp = torch.ones((1, 16, 28, 28))
+    pc = PrimaryCaps(in_channel=16, out_channel=16, kernel_size=28, num_capsule=4, capsule_length=4)
+    fc = FCCaps(4, 4, 10, 16)
+    length = Length()
+    mask = Mask()
+    gen = Generator((28, 28))
 
-    def forward(self, x):
-        return self.model(x)
-
-
-class BackBoneMNIST(nn.Module):
-    def __init__(self, in_channel):
-        super(BackBoneMNIST, self).__init__()
-        self.cbn_list = nn.Sequential(
-            CBN(in_channel, 32, 5),
-            CBN(32, 64, 3),
-            CBN(64, 64, 3),
-            CBN(64, 128, 3, 2)
-        )
-
-    def compute_shape(self, input_shape, batch_size: int = 1):
-        inputs = torch.ones((batch_size, *input_shape), dtype=torch.float32)
-        out = self.cbn_list(inputs)
-        return out.shape
-
-    def forward(self, x):
-        return self.cbn_list(x)
+    x = pc(inp)
+    print("pc", x.shape)
+    x = fc(x)
+    print(x.shape)
+    c = length(x)
+    print(c.shape)
+    m = mask(x)
+    print(m.shape)
+    x = torch.nn.Flatten()(x)
+    x = gen(x)
+    print(x.shape)
 
 
-class BackBoneSmallNorb(nn.Module):
-    def __init__(self, in_channel):
-        super(BackBoneSmallNorb, self).__init__()
-        self.cbn_list = nn.Sequential(
-            CBN(in_channel, 32, 5),
-            CBN(32, 64, 3),
-            CBN(64, 64, 3),
-            CBN(64, 128, 3, 2)
-        )
+#
+# if __name__ == '__main__':
+#     inp = torch.randn((1, 1, 28, 28))
+#     y = torch.randn((1, 10))
+#     model = Model(1, (28, 28))
+#
+#     out = model(inp, y)
+#     print(out[0].shape)
+#     print(out[1].shape)
+#     stat = model.state_dict()
+#
+#     model = Model(1, (28, 28), mode='test')
+#     model.load_state_dict(stat)
+#     out = model(inp)
+#     print(out[0].shape)
+#     print(out[1].shape)
 
-    def compute_shape(self, input_shape, batch_size: int = 1):
-        inputs = torch.ones((batch_size, *input_shape), dtype=torch.float32)
-        out = self.cbn_list(inputs)
-        return out.shape
 
-    def forward(self, x):
-        return self.cbn_list(x)

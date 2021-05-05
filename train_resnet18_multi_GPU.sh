@@ -59,5 +59,14 @@
 #./data/dataset --weight-decay 1e-4 --lr-scheduler mnist --lr 0.001
 
 
-python train_imagenet.py -d mnist -a capsule_efficient_without_docoder -b 256 -j 32 -c 10 --epoch 250 --dist-url 'tcp://127.0.0.1:8889' \
---dist-backend 'nccl' --multiprocessing-distributed --world-size 1 --rank 0 ./data/dataset --weight-decay 1e-7 --lr 0.001
+#python train_imagenet.py -d mnist -a capsule_efficient_without_docoder -b 256 -j 32 -c 10 --epoch 250 --dist-url 'tcp://127.0.0.1:8889' \
+#--dist-backend 'nccl' --multiprocessing-distributed --world-size 1 --rank 0 ./data/dataset --weight-decay 1e-7 --lr 0.001
+
+
+python train_imagenet.py -d cifar10 -a resnet18_cifar -b 256 -j 32 -c 10 --epoch 250 --dist-url 'tcp://127.0.0.1:8889' \
+--dist-backend 'nccl' --multiprocessing-distributed --world-size 1 --rank 0 ./data/dataset --weight-decay 1e-4 \
+--lr 0.1 --lr-scheduler imagenet
+
+
+python train_imagenet.py -d small_norb -a resnet18_cifar -b 256 -j 32 -c 10 --epoch 250  ./data/dataset \
+--lr 0.1 --lr-scheduler imagenet
