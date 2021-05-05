@@ -8,6 +8,7 @@ def arg_parse():
                          if name.islower() and not name.startswith("__")
                          and callable(models.__dict__[name]))
 
+    # parameters
     parser = argparse.ArgumentParser(description='PyTorch ImageNet Training')
     parser.add_argument('data', metavar='DIR',
                         help='path to dataset')
@@ -20,12 +21,8 @@ def arg_parse():
                         help='model architecture: ' +
                              ' | '.join(model_names) +
                              ' (default: resnet18)')
-    # parser.add_argument('--in-channels', default=3, type=int, metavar='N',
-    #                     help='number of classes (default: 3)')
     parser.add_argument('-c', '--classes', default=1001, type=int, metavar='N',
                         help='number of classes (default: 1001)')
-    parser.add_argument('-j', '--workers', default=16, type=int, metavar='N',
-                        help='number of data loading workers (default: 16)')
     parser.add_argument('--epochs', default=90, type=int, metavar='N',
                         help='number of total epochs to run')
     parser.add_argument('--start-epoch', default=0, type=int, metavar='N',
@@ -44,6 +41,10 @@ def arg_parse():
     parser.add_argument('--wd', '--weight-decay', default=1e-4, type=float,
                         metavar='W', help='weight decay (default: 1e-4)',
                         dest='weight_decay')
+
+    # options
+    parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
+                        help='number of data loading workers (default: 16)')
     parser.add_argument('-p', '--print-freq', default=10, type=int,
                         metavar='N', help='print frequency (default: 10)')
     parser.add_argument('--resume', default='', type=str, metavar='PATH',
@@ -71,4 +72,12 @@ def arg_parse():
                              'N processes per node, which has N GPUs. This is the '
                              'fastest way to use PyTorch for either single node or '
                              'multi node data parallel training')
+
+    # add on args
+    parser.add_argument('--in_shape', default=(3, 32, 32), nargs='+', type=int,
+                        help='Input image.')
+    parser.add_argument('--pose_dim', default=4, type=int, help='Capsule pose.')
+    parser.add_argument('--routing_iter', default=3, type=int, help='Capsule routing iter.')
+    parser.add_argument('--capsule_arch', default=[64, 8, 16, 16, 5], nargs='+', type=int,
+                        help='Capsule arch.')
     return parser

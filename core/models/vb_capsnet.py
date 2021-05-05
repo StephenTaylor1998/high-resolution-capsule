@@ -10,15 +10,15 @@ from core.layers.vb_routing import VariationalBayesRouting2d
 class CapsuleNet(nn.Module):
     """ Example: Simple 3 layer CapsNet """
 
-    def __init__(self, arch, n_classes, n_channels, pose_dim=4, routing_iter=3):
+    def __init__(self, arch, num_classes, in_channels, pose_dim=4, routing_iter=3):
         super(CapsuleNet, self).__init__()
         self.P = pose_dim
         self.PP = int(np.max([2, self.P * self.P]))
         self.A, self.B, self.C, self.D = arch[:-1]
-        self.n_classes = n_classes
-        if arch[-1] != n_classes:
+        self.n_classes = num_classes
+        if arch[-1] != num_classes:
             raise ValueError
-        self.in_channels = n_channels
+        self.in_channels = in_channels
 
         self.Conv_1 = nn.Conv2d(in_channels=self.in_channels, out_channels=self.A,
                                 kernel_size=5, stride=2, bias=False)
@@ -86,16 +86,16 @@ class CapsuleNet(nn.Module):
 class tinyCapsuleNet(nn.Module):
     """ Example: Simple 1 layer CapsNet """
 
-    def __init__(self, pose_dim, arch, n_classes, n_channels, routing_iter):
+    def __init__(self, arch, num_classes, in_channels, pose_dim=4, routing_iter=3):
         super(tinyCapsuleNet, self).__init__()
 
         self.P = pose_dim
         self.D = int(np.max([2, self.P * self.P]))
         self.A, self.B = arch[0], arch[2]
-        self.n_classes = n_classes
-        if arch[-1] != n_classes:
+        self.n_classes = num_classes
+        if arch[-1] != num_classes:
             raise ValueError
-        self.in_channels = n_channels
+        self.in_channels = in_channels
 
         self.Conv_1 = nn.Conv2d(in_channels=self.in_channels, out_channels=self.A,
                                 kernel_size=5, stride=2, bias=False)
@@ -131,19 +131,33 @@ class tinyCapsuleNet(nn.Module):
         return yhat
 
 
-def capsule_vb_mnist(arch=None, n_classes=10, n_channels=2, pose_dim=4, routing_iter=3, **kwargs):
-    if arch is None:
-        arch = [64, 8, 16, 16, 10]
-    return CapsuleNet(arch, n_classes, n_channels, pose_dim, routing_iter)
+def capsule_vb_mnist(num_classes=10, args=None, **kwargs):
+    in_channels = 1 if args.in_shape[0] is None else args.in_shape[0]
+    pose_dim = 4 if args.pose_dim is None else args.pose_dim
+    routing_iter = 3 if args.routing_iter is None else args.routing_iter
+    capsule_arch = [64, 8, 16, 16, 10] if args.capsule_arch is None else args.capsule_arch
+    return CapsuleNet(capsule_arch, num_classes, in_channels, pose_dim, routing_iter)
 
 
-def capsule_vb_smallnorb(arch=None, n_classes=5, n_channels=2, pose_dim=4, routing_iter=3, **kwargs):
-    if arch is None:
-        arch = [64, 8, 16, 16, 5]
-    return CapsuleNet(arch, n_classes, n_channels, pose_dim, routing_iter)
+def capsule_vb_smallnorb(num_classes=5, args=None, **kwargs):
+    in_channels = 2 if args.in_shape[0] is None else args.in_shape[0]
+    pose_dim = 4 if args.pose_dim is None else args.pose_dim
+    routing_iter = 3 if args.routing_iter is None else args.routing_iter
+    capsule_arch = [64, 8, 16, 16, 5] if args.capsule_arch is None else args.capsule_arch
+    return CapsuleNet(capsule_arch, num_classes, in_channels, pose_dim, routing_iter)
 
 
-def capsule_vb_cifar(arch=None, n_classes=10, n_channels=2, pose_dim=4, routing_iter=3, **kwargs):
-    if arch is None:
-        arch = [64, 8, 16, 16, 10]
-    return CapsuleNet(arch, n_classes, n_channels, pose_dim, routing_iter)
+def capsule_vb_cifar(num_classes=10, args=None, **kwargs):
+    in_channels = 3 if args.in_shape[0] is None else args.in_shape[0]
+    pose_dim = 4 if args.pose_dim is None else args.pose_dim
+    routing_iter = 3 if args.routing_iter is None else args.routing_iter
+    capsule_arch = [64, 8, 16, 16, 10] if args.capsule_arch is None else args.capsule_arch
+    return CapsuleNet(capsule_arch, num_classes, in_channels, pose_dim, routing_iter)
+
+
+def capsule_vb_tiny_smallnorb(num_classes=5, args=None, **kwargs):
+    in_channels = 2 if args.in_shape[0] is None else args.in_shape[0]
+    pose_dim = 4 if args.pose_dim is None else args.pose_dim
+    routing_iter = 3 if args.routing_iter is None else args.routing_iter
+    capsule_arch = [64, 16, 5] if args.capsule_arch is None else args.capsule_arch
+    return CapsuleNet(capsule_arch, num_classes, in_channels, pose_dim, routing_iter)

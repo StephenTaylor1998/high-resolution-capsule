@@ -1,14 +1,12 @@
-
 import torch
 import torch.nn as nn
 from core.layers.transforms.dwt import DWTForward
-from core.layers.gate_torch import DynamicGate
 
 
 class BasicBlock(nn.Module):
     expansion = 1
 
-    def __init__(self, in_planes, planes, stride=1, **kwargs):
+    def __init__(self, in_planes, planes, stride=1):
         super(BasicBlock, self).__init__()
         self.in_planes = in_planes
         self.planes = planes
@@ -35,7 +33,7 @@ class BasicBlock(nn.Module):
 class Bottleneck(nn.Module):
     expansion = 4
 
-    def __init__(self, in_planes, planes, stride=1, **kwargs):
+    def __init__(self, in_planes, planes, stride=1):
         super(Bottleneck, self).__init__()
         self.in_planes = in_planes
         self.planes = planes
@@ -77,8 +75,8 @@ class TinyBlockDWT(nn.Module):
             self.conv2 = nn.Conv2d((self.planes * 4) // 2, self.planes, kernel_size=1, stride=1, bias=False)
             self.bn2 = nn.BatchNorm2d(self.planes)
         else:
-            self.conv1 = nn.Conv2d(self.in_planes, self.planes//2, kernel_size=3, stride=1, padding=1, bias=False)
-            self.bn1 = nn.BatchNorm2d(self.planes //2)
+            self.conv1 = nn.Conv2d(self.in_planes, self.planes // 2, kernel_size=3, stride=1, padding=1, bias=False)
+            self.bn1 = nn.BatchNorm2d(self.planes // 2)
             self.conv2 = nn.Conv2d(self.planes // 2, self.planes, kernel_size=1, stride=1, bias=False)
             self.bn2 = nn.BatchNorm2d(self.planes)
 
@@ -111,11 +109,11 @@ class TinyBottleDWT(nn.Module):
         self.bn1 = nn.BatchNorm2d(self.planes)
         if stride == 2:
             self.conv2 = DWTForward()
-            self.bn2 = nn.BatchNorm2d(self.planes*8 //2)
-            self.conv3 = nn.Conv2d(self.planes*8 // 2, self.expansion * self.planes, kernel_size=1, bias=False)
+            self.bn2 = nn.BatchNorm2d(self.planes * 8 // 2)
+            self.conv3 = nn.Conv2d(self.planes * 8 // 2, self.expansion * self.planes, kernel_size=1, bias=False)
             self.bn3 = nn.BatchNorm2d(self.expansion * self.planes)
         else:
-            self.conv2 = nn.Conv2d(self.planes, self.planes //2, kernel_size=3, stride=stride, padding=1, bias=False)
+            self.conv2 = nn.Conv2d(self.planes, self.planes // 2, kernel_size=3, stride=stride, padding=1, bias=False)
             self.bn2 = nn.BatchNorm2d(self.planes // 2)
             self.conv3 = nn.Conv2d(self.planes // 2, self.expansion * self.planes, kernel_size=1, bias=False)
             self.bn3 = nn.BatchNorm2d(self.expansion * self.planes)
@@ -261,45 +259,6 @@ class ResNet(nn.Module):
         return out
 
 
-class GumbelGateimp(nn.Module):
-    expansion = 1
-
-    def __init__(self, in_planes, planes, stride=1):
-        super(GumbelGateimp, self).__init__()
-        self.in_planes = in_planes
-        self.planes = planes
-        self.stride = stride
-        self.conv1 = nn.Conv2d(self.in_planes, self.planes, kernel_size=1, bias=False)
-        self.bn1 = nn.BatchNorm2d(self.planes)
-
-        if stride == 2:
-            self.conv2 = nn.Conv2d(self.planes, self.planes, kernel_size=3, stride=self.stride, padding=1, bias=False)
-        else:
-            self.conv2 = nn.Conv2d(self.planes, self.planes, kernel_size=3, stride=self.stride, padding=1, bias=False)
-        # self.gate = DynamicGate(self.planes)
-        self.bn2 = nn.BatchNorm2d(self.planes)
-        self.gate = DynamicGate(self.planes)
-
-        self.conv3 = nn.Conv2d(self.planes, self.expansion * self.planes, kernel_size=1, bias=False)
-        self.bn3 = nn.BatchNorm2d(self.expansion * self.planes)
-        self.relu = nn.ReLU()
-        self.shortcut = nn.Sequential()
-        if self.stride != 1 or self.in_planes != self.expansion * self.planes:
-            self.shortcut = nn.Sequential(
-                nn.Conv2d(self.in_planes, self.expansion * self.planes, kernel_size=1, stride=self.stride, bias=False),
-                nn.BatchNorm2d(self.expansion * self.planes)
-            )
-
-    def forward(self, inputs):
-        out = self.relu(self.bn1(self.conv1(inputs)))
-        out = self.relu(self.bn2(self.conv2(out)))
-        out = self.gate(out, temperature=1e-3)
-        out = self.bn3(self.conv3(out))
-        out += self.shortcut(inputs)
-        out = self.relu(out)
-        return out
-
-
 class ResNetBackbone(nn.Module):
     def __init__(self, block, num_blocks, half=True):
         super(ResNetBackbone, self).__init__()
@@ -336,7 +295,7 @@ class ResNetBackbone(nn.Module):
         return out
 
 
-def resnet18_cifar(block=BasicBlock, num_blocks=None, num_classes=10, half=False, backbone=False):
+def resnet18_cifar(block=BasicBlock, num_blocks=None, num_classes=10, half=False, backbone=False, **kwargs):
     if num_blocks is None:
         num_blocks = [2, 2, 2, 2]
     if backbone:
@@ -345,7 +304,7 @@ def resnet18_cifar(block=BasicBlock, num_blocks=None, num_classes=10, half=False
         return ResNet(block, num_blocks, num_classes=num_classes, half=half)
 
 
-def resnet34_cifar(block=BasicBlock, num_blocks=None, num_classes=10, half=False, backbone=False):
+def resnet34_cifar(block=BasicBlock, num_blocks=None, num_classes=10, half=False, backbone=False, **kwargs):
     if num_blocks is None:
         num_blocks = [3, 4, 6, 3]
     if backbone:
@@ -354,7 +313,7 @@ def resnet34_cifar(block=BasicBlock, num_blocks=None, num_classes=10, half=False
         return ResNet(block, num_blocks, num_classes=num_classes, half=half)
 
 
-def resnet50_cifar(block=Bottleneck, num_blocks=None, num_classes=10, half=False, backbone=False):
+def resnet50_cifar(block=Bottleneck, num_blocks=None, num_classes=10, half=False, backbone=False, **kwargs):
     if num_blocks is None:
         num_blocks = [3, 4, 6, 3]
     if backbone:
@@ -363,7 +322,7 @@ def resnet50_cifar(block=Bottleneck, num_blocks=None, num_classes=10, half=False
         return ResNet(block, num_blocks, num_classes=num_classes, half=half)
 
 
-def resnet18_dwt_half(block=BasicBlockDWT, num_blocks=None, num_classes=10, half=True, backbone=False):
+def resnet18_dwt_half(block=BasicBlockDWT, num_blocks=None, num_classes=10, half=True, backbone=False, **kwargs):
     if num_blocks is None:
         num_blocks = [2, 2, 2, 2]
     if backbone:
@@ -372,7 +331,7 @@ def resnet18_dwt_half(block=BasicBlockDWT, num_blocks=None, num_classes=10, half
         return ResNet(block, num_blocks, num_classes=num_classes, half=half)
 
 
-def resnet34_dwt_half(block=BasicBlockDWT, num_blocks=None, num_classes=10, half=True, backbone=False):
+def resnet34_dwt_half(block=BasicBlockDWT, num_blocks=None, num_classes=10, half=True, backbone=False, **kwargs):
     if num_blocks is None:
         num_blocks = [3, 4, 6, 3]
     if backbone:
@@ -381,7 +340,7 @@ def resnet34_dwt_half(block=BasicBlockDWT, num_blocks=None, num_classes=10, half
         return ResNet(block, num_blocks, num_classes=num_classes, half=half)
 
 
-def resnet50_dwt_half(block=BottleneckDWT, num_blocks=None, num_classes=10, half=True, backbone=False):
+def resnet50_dwt_half(block=BottleneckDWT, num_blocks=None, num_classes=10, half=True, backbone=False, **kwargs):
     if num_blocks is None:
         num_blocks = [3, 4, 6, 3]
     if backbone:
@@ -390,7 +349,7 @@ def resnet50_dwt_half(block=BottleneckDWT, num_blocks=None, num_classes=10, half
         return ResNet(block, num_blocks, num_classes=num_classes, half=half)
 
 
-def resnet18_dwt_tiny(block=TinyBlockDWT, num_blocks=None, num_classes=10, half=False, backbone=False):
+def resnet18_dwt_tiny(block=TinyBlockDWT, num_blocks=None, num_classes=10, half=False, backbone=False, **kwargs):
     if num_blocks is None:
         num_blocks = [2, 2, 2, 2]
     if backbone:
@@ -399,7 +358,7 @@ def resnet18_dwt_tiny(block=TinyBlockDWT, num_blocks=None, num_classes=10, half=
         return ResNet(block, num_blocks, num_classes=num_classes, half=half)
 
 
-def resnet34_dwt_tiny(block=TinyBlockDWT, num_blocks=None, num_classes=10, half=False, backbone=False):
+def resnet34_dwt_tiny(block=TinyBlockDWT, num_blocks=None, num_classes=10, half=False, backbone=False, **kwargs):
     if num_blocks is None:
         num_blocks = [3, 4, 6, 3]
     if backbone:
@@ -408,7 +367,7 @@ def resnet34_dwt_tiny(block=TinyBlockDWT, num_blocks=None, num_classes=10, half=
         return ResNet(block, num_blocks, num_classes=num_classes, half=half)
 
 
-def resnet50_dwt_tiny(block=TinyBottleDWT, num_blocks=None, num_classes=10, half=False, backbone=False):
+def resnet50_dwt_tiny(block=TinyBottleDWT, num_blocks=None, num_classes=10, half=False, backbone=False, **kwargs):
     if num_blocks is None:
         num_blocks = [3, 4, 6, 3]
     if backbone:
@@ -417,7 +376,7 @@ def resnet50_dwt_tiny(block=TinyBottleDWT, num_blocks=None, num_classes=10, half
         return ResNet(block, num_blocks, num_classes=num_classes, half=half)
 
 
-def resnet18_dwt_tiny_half(block=TinyBlockDWT, num_blocks=None, num_classes=10, half=True, backbone=False):
+def resnet18_dwt_tiny_half(block=TinyBlockDWT, num_blocks=None, num_classes=10, half=True, backbone=False, **kwargs):
     if num_blocks is None:
         num_blocks = [2, 2, 2, 2]
     if backbone:
@@ -426,7 +385,7 @@ def resnet18_dwt_tiny_half(block=TinyBlockDWT, num_blocks=None, num_classes=10, 
         return ResNet(block, num_blocks, num_classes=num_classes, half=half)
 
 
-def resnet34_dwt_tiny_half(block=TinyBlockDWT, num_blocks=None, num_classes=10, half=True, backbone=False):
+def resnet34_dwt_tiny_half(block=TinyBlockDWT, num_blocks=None, num_classes=10, half=True, backbone=False, **kwargs):
     if num_blocks is None:
         num_blocks = [3, 4, 6, 3]
     if backbone:
@@ -435,7 +394,7 @@ def resnet34_dwt_tiny_half(block=TinyBlockDWT, num_blocks=None, num_classes=10, 
         return ResNet(block, num_blocks, num_classes=num_classes, half=half)
 
 
-def resnet50_dwt_tiny_half(block=TinyBottleDWT, num_blocks=None, num_classes=10, half=True, backbone=False):
+def resnet50_dwt_tiny_half(block=TinyBottleDWT, num_blocks=None, num_classes=10, half=True, backbone=False, **kwargs):
     if num_blocks is None:
         num_blocks = [3, 4, 6, 3]
     if backbone:

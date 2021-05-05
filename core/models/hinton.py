@@ -9,8 +9,8 @@ class Capsule(nn.Module):
         self.conv = nn.Conv2d(in_shape[0], 256, kernel_size=9)
         self.bn = nn.BatchNorm2d(256)
         self.primary_caps = PrimaryCaps(256, 32, 8, 9, 2)
-        h = (in_shape[2] - 9 + 1 - 9 + 1)//2
-        w = (in_shape[3] - 9 + 1 - 9 + 1)//2
+        h = (in_shape[1] - 9 + 1 - 9 + 1)//2
+        w = (in_shape[2] - 9 + 1 - 9 + 1)//2
         self.digit_caps = DigitCaps(h, w, 32, 8, num_classes, 16, routing=3)
         self.length = Length()
 
