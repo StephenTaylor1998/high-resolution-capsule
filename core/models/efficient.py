@@ -67,7 +67,6 @@ def capsule_efficient_without_docoder_mnist(num_classes=10, args=None, **kwargs)
 
 def capsule_efficient_without_docoder_smallnorb(num_classes=5, args=None, **kwargs):
     in_shape = (2, 32, 32) if args.in_shape is None else args.in_shape
-    mode = 'train' if args.mode is None else args.mode
     return Capsule(in_shape, num_classes, decoder=False)
 
 
