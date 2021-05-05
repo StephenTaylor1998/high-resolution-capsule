@@ -26,12 +26,12 @@ class Capsule(nn.Module):
 
 
 class Model(nn.Module):
-    def __init__(self, in_channels, out_shape, mode='train'):
+    def __init__(self, in_shape, num_classes, mode='train'):
         super(Model, self).__init__()
         self.mode = mode
-        self.capsule = Capsule(in_channels)
+        self.capsule = Capsule(in_shape, num_classes)
         self.mask = Mask()
-        self.generator = Generator(out_shape)
+        self.generator = Generator(in_shape)
 
     def forward(self, x, y=None):
         digit, classes = self.capsule(x)

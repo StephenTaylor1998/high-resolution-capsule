@@ -27,7 +27,7 @@ class Model(nn.Module):
     def __init__(self, in_shape, num_classes, mode='train'):
         super(Model, self).__init__()
         self.mode = mode
-        self.capsule = Capsule(in_shape[0], num_classes)
+        self.capsule = Capsule(in_shape, num_classes)
         self.mask = Mask()
         self.generator = Generator(in_shape)
 
