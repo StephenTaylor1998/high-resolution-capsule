@@ -14,7 +14,6 @@ from core.utils.copy_weights import copy_weights
 from core.utils.resume import resume_from_checkpoint
 from core.engine.base import validate, train, save_checkpoint
 
-
 best_acc1 = 0
 
 
@@ -35,10 +34,19 @@ def main_worker(gpu, ngpus_per_node, args):
     # create model
     if args.pretrained:
         print("=> using pre-trained model '{}'".format(args.arch))
-        model = models.__dict__[args.arch](pretrained=True, num_classes=args.classes)
+        try:
+            model = models.__dict__[args.arch](pretrained=True, num_classes=args.classes, args=args)
+        except TypeError:
+            print(F"Parameter Type Error, fixing...")
+            model = models.__dict__[args.arch](pretrained=True, num_classes=args.classes)
+
     else:
         print("=> creating model '{}'".format(args.arch))
-        model = models.__dict__[args.arch](num_classes=args.classes)
+        try:
+            model = models.__dict__[args.arch](num_classes=args.classes, args=args)
+        except TypeError:
+            print(F"Parameter Type Error, fixing...")
+            model = models.__dict__[args.arch](num_classes=args.classes)
 
     if not torch.cuda.is_available():
         print('using CPU, this will be slow')
@@ -68,11 +76,11 @@ def main_worker(gpu, ngpus_per_node, args):
 
     adjust_learning_rate = get_scheduler_by_name(args.lr_scheduler)
 
-    # optimizer = torch.optim.SGD(model.parameters(), args.lr,
-    #                             momentum=args.momentum,
-    #                             weight_decay=args.weight_decay)
-    optimizer = torch.optim.Adam(model.parameters(), args.lr,
-                                 weight_decay=args.weight_decay)
+    optimizer = torch.optim.SGD(model.parameters(), args.lr,
+                                momentum=args.momentum,
+                                weight_decay=args.weight_decay)
+    # optimizer = torch.optim.Adam(model.parameters(), args.lr,
+    #                              weight_decay=args.weight_decay)
 
     # optionally resume from a checkpoint
     if args.resume:
@@ -86,8 +94,10 @@ def main_worker(gpu, ngpus_per_node, args):
     # train data loader is here, distribute is support #
     if args.distributed:
         train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset)
+        val_sampler = torch.utils.data.distributed.DistributedSampler(val_dataset)
     else:
         train_sampler = None
+        val_sampler = None
 
     train_loader = torch.utils.data.DataLoader(
         train_dataset, batch_size=args.batch_size, shuffle=(train_sampler is None),
@@ -97,8 +107,8 @@ def main_worker(gpu, ngpus_per_node, args):
     # val data loader is here #
     val_loader = torch.utils.data.DataLoader(
         val_dataset,
-        batch_size=args.batch_size, shuffle=False,
-        num_workers=args.workers, pin_memory=True)
+        batch_size=args.batch_size, shuffle=(val_sampler is None),
+        num_workers=args.workers, pin_memory=True, sampler=val_sampler)
     # ^^^^^^^^^^^^^^^^^^^^^^^ #
     if args.evaluate:
         validate(val_loader, model, criterion, args)
@@ -121,6 +131,7 @@ def main_worker(gpu, ngpus_per_node, args):
     for epoch in range(args.start_epoch, args.epochs):
         if args.distributed:
             train_sampler.set_epoch(epoch)
+            val_sampler.set_epoch(epoch)
         # adjust_learning_rate(optimizer, epoch, args)
         adjust_learning_rate(optimizer, epoch, args)
 

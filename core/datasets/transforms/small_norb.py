@@ -48,7 +48,17 @@ def sample_weights(labels):
     return class_weights[list(map(int, labels))]
 
 
-def get_transform(args):
+class DefaultArgs(object):
+    def __init__(self):
+        super(DefaultArgs, self).__init__()
+        self.crop_dim = 32
+        self.brightness = 0
+        self.contrast = 0
+
+
+def get_transform(args=None):
+    if args is None:
+        args = DefaultArgs()
     return {
         'train_valid': transforms.Compose([
             transforms.ToPILImage(),

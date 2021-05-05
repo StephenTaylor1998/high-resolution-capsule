@@ -111,37 +111,60 @@ def smallnorb(args, dataset_paths):
     return dataloaders
 
 
-def train_valid_dataset(data_dir, args, **kwargs):
-    transf = get_transform(args)['train_valid']
+#
+# def train_valid_dataset(data_dir, args=None, **kwargs):
+#     transf = get_transform(args)
+#     data_dir = os.path.join(data_dir, "train")
+#     return smallNORB(data_dir, transform=transf['train_valid'], shuffle=True)
+#
+#
+# def test_dataset(data_dir, args=None, **kwargs):
+#     transf = get_transform(args)
+#     data_dir = os.path.join(data_dir, "test")
+#     return smallNORB(data_dir, transform=transf['test'], shuffle=False)
+#
+#
+# def train_dataset(data_dir, args=None, **kwargs):
+#     transf = get_transform(args)
+#     data_dir = os.path.join(data_dir, "train")
+#     train_valid = smallNORB(data_dir, transform=transf['train_valid'], shuffle=False)
+#     data, labels = random_split(data=train_valid.data,
+#                                 labels=train_valid.labels,
+#                                 n_classes=5,
+#                                 n_samples_per_class=np.unique(
+#                                     train_valid.labels, return_counts=True
+#                                 )[1] // 5)
+#
+#     return CustomDataset(data=data['train'], labels=labels['train'], transform=transf['train'])
+#
+#
+# def val_dataset(data_dir, args=None, **kwargs):
+#     transf = get_transform(args)
+#     data_dir = os.path.join(data_dir, "train")
+#     train_valid = smallNORB(data_dir, transform=transf['train_valid'], shuffle=False)
+#     data, labels = random_split(data=train_valid.data,
+#                                 labels=train_valid.labels,
+#                                 n_classes=5,
+#                                 n_samples_per_class=np.unique(
+#                                     train_valid.labels, return_counts=True
+#                                 )[1] // 5)
+#
+#     return CustomDataset(data=data['valid'], labels=labels['valid'], transform=transf['valid'])
+
+
+def train_dataset(data_dir, args=None, **kwargs):
+    transf = get_transform(args)
+    data_dir = os.path.join(data_dir, "train")
     return smallNORB(data_dir, transform=transf['train_valid'], shuffle=True)
 
 
-def test_dataset(data_dir, args, **kwargs):
-    transf = get_transform(args)['test']
+def test_dataset(data_dir, args=None, **kwargs):
+    transf = get_transform(args)
+    data_dir = os.path.join(data_dir, "test")
     return smallNORB(data_dir, transform=transf['test'], shuffle=False)
 
 
-def train_dataset(data_dir, args, **kwargs):
-    transf = get_transform(args)['train_valid']
-    train_valid = smallNORB(data_dir, transform=transf['train_valid'], shuffle=True)
-    data, labels = random_split(data=train_valid['train_valid'].data,
-                                labels=train_valid['train_valid'].labels,
-                                n_classes=5,
-                                n_samples_per_class=np.unique(
-                                    train_valid['train_valid'].labels, return_counts=True
-                                )[1] // 5)
-
-    return CustomDataset(data=data['train'], labels=labels['train'], transform=transf['train'])
-
-
-def valid_dataset(data_dir, args, **kwargs):
-    transf = get_transform(args)['train_valid']
-    train_valid = smallNORB(data_dir, transform=transf['train_valid'], shuffle=False)
-    data, labels = random_split(data=train_valid['train_valid'].data,
-                                labels=train_valid['train_valid'].labels,
-                                n_classes=5,
-                                n_samples_per_class=np.unique(
-                                    train_valid['train_valid'].labels, return_counts=True
-                                )[1] // 5)
-
-    return CustomDataset(data=data['valid'], labels=labels['valid'], transform=transf['valid'])
+def val_dataset(data_dir, args=None, **kwargs):
+    transf = get_transform(args)
+    data_dir = os.path.join(data_dir, "test")
+    return smallNORB(data_dir, transform=transf['test'], shuffle=False)
