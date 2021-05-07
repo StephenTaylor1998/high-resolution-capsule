@@ -1,13 +1,11 @@
 import torch
 from torch import nn
-from torch.autograd import Variable
-from torch.nn import functional
 
 
-class Condense(nn.Module):
+class CondenseTiny(nn.Module):
 
     def __init__(self, in_channels, scale_rate=1):
-        super(Condense, self).__init__()
+        super(CondenseTiny, self).__init__()
         self.conv = nn.Conv1d(in_channels=in_channels, out_channels=in_channels,
                               kernel_size=scale_rate, stride=scale_rate, bias=False)
         self.bn = nn.BatchNorm1d(in_channels)
@@ -26,17 +24,17 @@ class Condense(nn.Module):
         return x
 
 
-class FPN(nn.Module):
+class FPN_Tiny(nn.Module):
     def __init__(self, in_shape, scale_rate_list=None):
-        super(FPN, self).__init__()
+        super(FPN_Tiny, self).__init__()
         scale_rate_list = [2, 2, 2, 1] if scale_rate_list is None else scale_rate_list
-        self.condense1 = Condense(in_shape[0], scale_rate_list[0])
+        self.condense1 = CondenseTiny(in_shape[0], scale_rate_list[0])
         shape1 = self.condense1.compute_shape(in_shape)
-        self.condense2 = Condense(shape1[0], scale_rate_list[1])
+        self.condense2 = CondenseTiny(shape1[0], scale_rate_list[1])
         shape2 = self.condense2.compute_shape(shape1)
-        self.condense3 = Condense(shape2[0], scale_rate_list[2])
+        self.condense3 = CondenseTiny(shape2[0], scale_rate_list[2])
         shape3 = self.condense3.compute_shape(shape2)
-        self.condense4 = Condense(shape3[0], scale_rate_list[3])
+        self.condense4 = CondenseTiny(shape3[0], scale_rate_list[3])
         self.feature_pyramid = torch.cat
 
     def forward(self, x):
@@ -60,10 +58,8 @@ class CapsSimilarity(nn.Module):
         return x
 
 
-if __name__ == '__main__':
-    # inp = torch.ones((2, 8, 16), dtype=torch.float32)
-    inp = torch.randn((2, 8, 16), dtype=torch.float32)
-    # out = FPN((8, 16))(inp)
-    out = CapsSimilarity()(inp)
-    print(out.shape)
-    print(out)
+# if __name__ == '__main__':
+#     inp = torch.ones((1, 32, 224, 224))
+#     # out = CapsConv2d()(inp)
+#     out = PrimaryDWT()(inp)
+#     print(out.shape)

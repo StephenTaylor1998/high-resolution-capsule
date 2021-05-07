@@ -1,18 +1,18 @@
 import torch
 from torch import nn
 
-from core.layers.operator import FPN, CapsSimilarity
+from core.layers.operator_vector import FPN_Tiny, CapsSimilarity
 
 
 class RoutingBlockVector(nn.Module):
     def __init__(self, in_shape, routing_name):
         super(RoutingBlockVector, self).__init__()
         if routing_name == "Tiny_FPN":
-            self.fpn = FPN(in_shape, [2, 2, 2, 1])
-        elif routing_name == "FPN":
+            self.fpn = FPN_Tiny(in_shape, [2, 2, 2, 1])
+        elif routing_name == "FPN_Tiny":
             raise NotImplementedError
         else:
-            print(f"FPN name {routing_name} should in ['Tiny_FPN', 'FPN']")
+            print(f"FPN_Tiny name {routing_name} should in ['Tiny_FPN', 'FPN_Tiny']")
             raise NotImplementedError
 
         # self.similarity = CapsSimilarity()
