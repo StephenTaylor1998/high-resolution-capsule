@@ -74,10 +74,13 @@ def arg_parse():
                              'multi node data parallel training')
 
     # add on args
-    parser.add_argument('--in_shape', default=(3, 32, 32), nargs='+', type=int,
+    parser.add_argument('--in-shape', default=(3, 32, 32), nargs='+', type=int,
                         help='Input image.')
     parser.add_argument('--pose_dim', default=4, type=int, help='Capsule pose.')
-    parser.add_argument('--routing_iter', default=3, type=int, help='Capsule routing iter.')
-    parser.add_argument('--capsule_arch', default=[64, 8, 16, 16, 5], nargs='+', type=int,
+    parser.add_argument('--routing-iter', default=3, type=int, help='Capsule routing iter.')
+    parser.add_argument('--capsule-arch', default=[64, 8, 16, 16, 5], nargs='+', type=int,
                         help='Capsule arch.')
+    parser.add_argument('--routing-name-list', default=["FPN"], nargs='+', type=str,
+                        help='FPN routing.')
+    parser.add_argument('--backbone', default="resnet50_dwt_tiny_half", type=str, help='FPN routing.')
     return parser
