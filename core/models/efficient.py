@@ -7,8 +7,8 @@ class Capsule(nn.Module):
         super(Capsule, self).__init__()
         self.decoder = decoder
         self.cbn_list = BackBoneMNIST(in_shape[0])
-        kernel_size = self.cbn_list.compute_shape(in_shape)
-        self.primary_caps = PrimaryCaps(128, 128, kernel_size[-1], 16, 8)
+        out_shape = self.cbn_list.compute_shape(in_shape)
+        self.primary_caps = PrimaryCaps(128, 128, out_shape[-1], 16, 8)
         self.digit_caps = FCCaps(16, 8, num_classes, 16)
         self.length = Length()
 

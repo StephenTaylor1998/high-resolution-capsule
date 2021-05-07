@@ -42,6 +42,7 @@ def main_worker(gpu, ngpus_per_node, args):
 
     else:
         print("=> creating model '{}'".format(args.arch))
+        # model = models.__dict__[args.arch](num_classes=args.classes, args=args)
         try:
             model = models.__dict__[args.arch](num_classes=args.classes, args=args)
         except TypeError:

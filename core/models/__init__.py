@@ -22,3 +22,5 @@ from .efficient import \
     capsule_efficient_smallnorb, capsule_efficient_without_docoder_smallnorb
 
 from .vb_capsnet import capsule_vb_mnist, capsule_vb_cifar, capsule_vb_smallnorb, capsule_vb_tiny_smallnorb
+
+from .hr_caps_dwt import capsule_efficient_cifar

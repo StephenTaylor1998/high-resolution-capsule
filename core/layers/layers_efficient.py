@@ -24,6 +24,11 @@ class PrimaryCaps(nn.Module):
         self.conv = nn.Conv2d(in_channel, out_channel, kernel_size, stride, groups=out_channel)
         self.squash = Squash()
 
+    def compute_shape(self, input_shape, batch_size: int = 1, data_type=torch.float32):
+        inputs = torch.ones((batch_size, *input_shape), dtype=data_type)
+        out = self.forward(inputs)
+        return out.shape[1:]
+
     def forward(self, x):
         x = self.conv(x)
         x = torch.reshape(x, (x.shape[0], self.num_capsule, self.capsule_length))
@@ -140,7 +145,7 @@ class BackBoneMNIST(nn.Module):
     def compute_shape(self, input_shape, batch_size: int = 1, data_type=torch.float32):
         inputs = torch.ones((batch_size, *input_shape), dtype=data_type)
         out = self.forward(inputs)
-        return out.shape
+        return out.shape[1:]
 
     def forward(self, x):
         return self.cbn_list(x)
@@ -159,7 +164,7 @@ class BackBoneSmallNorb(nn.Module):
     def compute_shape(self, input_shape, batch_size: int = 1):
         inputs = torch.ones((batch_size, *input_shape), dtype=torch.float32)
         out = self.cbn_list(inputs)
-        return out.shape
+        return out.shape[1:]
 
     def forward(self, x):
         return self.cbn_list(x)
