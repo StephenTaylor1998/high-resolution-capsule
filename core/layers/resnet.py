@@ -244,7 +244,7 @@ class ResNetBackbone(nn.Module):
     def compute_shape(self, shape, batch_size=1, data_type=torch.float32):
         inputs = torch.ones((batch_size, *shape), dtype=data_type)
         out = self.forward(inputs)
-        return out.shape
+        return out.shape[1:]
 
     def forward(self, inputs):
         out = self.relu(self.bn1(self.conv1(inputs)))

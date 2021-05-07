@@ -1,8 +1,14 @@
 import torch
 import torch.nn as nn
 
-from core.layers.resnet import BasicBlock, ResNetBackbone, Bottleneck, BasicBlockDWT, BottleneckDWT, TinyBlockDWT, \
-    TinyBottleDWT
+from core.layers.resnet import \
+    BasicBlock, \
+    Bottleneck, \
+    BasicBlockDWT, \
+    BottleneckDWT, \
+    TinyBlockDWT, \
+    TinyBottleDWT, \
+    ResNetBackbone
 
 
 class ResNet(nn.Module):
