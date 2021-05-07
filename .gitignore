@@ -6,3 +6,4 @@
 /data/dataset/
 /data/weights/resnet50_tiny_c1_epoch90_bs128_lr1.0e-01_data/
 demo.py
+/demo/
