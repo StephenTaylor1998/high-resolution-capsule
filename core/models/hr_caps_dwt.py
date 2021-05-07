@@ -1,9 +1,9 @@
 import torch
 from torch import nn
-from core.layers import operator, resnet
+from core.layers import operator_vector, resnet
 from core.layers.layers_efficient import PrimaryCaps, Length, FCCaps
 from core.models import resnet50_dwt_tiny_half
-from core.layers.routing import RoutingVector
+from core.layers.routing_vector import RoutingVector
 
 
 class Model(nn.Module):
