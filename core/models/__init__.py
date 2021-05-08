@@ -11,16 +11,9 @@ from .resnet import resnet18_cifar, resnet34_cifar, resnet50_cifar, \
     resnet50_dwt_half, resnet50_dwt_tiny, resnet50_dwt_tiny_half
 
 # ------------------------------------ capsule ------------------------------------ #
-from .hinton import \
-    capsule_hinton_cifar, capsule_hinton_without_docoder_cifar, \
-    capsule_hinton_nmist, capsule_hinton_without_docoder_mnist, \
-    capsule_hinton_smallnorb, capsule_hinton_without_docoder_smallnorb
 
-from .efficient import \
-    capsule_efficient_mnist, capsule_efficient_without_docoder_mnist, \
-    capsule_efficient_cifar, capsule_efficient_without_docoder_cifar, \
-    capsule_efficient_smallnorb, capsule_efficient_without_docoder_smallnorb
-
-from .vb_capsnet import capsule_vb_mnist, capsule_vb_cifar, capsule_vb_smallnorb, capsule_vb_tiny_smallnorb
+from .others.capsnet_vb import capsule_vb_mnist, capsule_vb_cifar, capsule_vb_smallnorb, capsule_vb_tiny_smallnorb
 
 from .hr_caps_dwt import capsule_efficient_cifar, hr_caps_r_fpn
+
+from .others import capsnet_em, capsnet_sr, capsnet_dr

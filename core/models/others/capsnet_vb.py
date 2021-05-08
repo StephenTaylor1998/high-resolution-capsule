@@ -2,9 +2,7 @@ import torch
 import numpy as np
 import torch.nn as nn
 import torch.nn.functional as F
-
-from core.layers.layer_em import PrimaryCapsules2d, ConvCapsules2d
-from core.layers.routing_vb import VariationalBayesRouting2d
+from core.layers.others.layers_vb import VariationalBayesRouting2d, PrimaryCapsules2d, ConvCapsules2d
 
 
 class CapsuleNet(nn.Module):
