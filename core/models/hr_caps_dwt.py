@@ -5,8 +5,8 @@ from typing import Union
 from core.layers.routing_vector import RoutingVector
 from core.layers.routing_matrix import RoutingMatrix
 from core.layers.routing_matrix import Length as LengthMatrix
-from core.layers.layers_efficient import Length as LengthVector
-from core.layers.layers_efficient import PrimaryCaps, FCCaps
+from core.layers.others.layers_efficient import Length as LengthVector
+from core.layers.others.layers_efficient import PrimaryCaps, FCCaps
 
 
 class ModelVector(nn.Module):

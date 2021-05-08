@@ -9,7 +9,7 @@ def copy_weights(arg, epoch):
     learning_rate = arg.lr
     datasets = arg.data_format.strip()
 
-    folder_name = '%s_epoch%d_bs%3d_lr%.1e_%s' % \
+    folder_name = '%s_epoch%d_bs%d_lr%.1e_%s' % \
                   (model_name, epochs, batch_size, learning_rate, datasets)
     # print(folder_name)
     folder_path = os.path.join('./data/weights', folder_name)
