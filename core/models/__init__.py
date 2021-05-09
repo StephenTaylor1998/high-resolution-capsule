@@ -16,4 +16,7 @@ from .others.capsnet_vb import capsule_vb_mnist, capsule_vb_cifar, capsule_vb_sm
 
 from .hr_caps_dwt import capsule_efficient_cifar, hr_caps_r_fpn
 
-from .others import capsnet_em, capsnet_sr, capsnet_dr
+from .others import \
+    capsnet_em, capsnet_em_routingx1, capsnet_em_r20_routingx1, \
+    capsnet_sr, capsnet_sr_routingx1, capsnet_sr_r20_routingx1, \
+    capsnet_dr, capsnet_dr_routingx1, capsnet_dr_r20_routingx1

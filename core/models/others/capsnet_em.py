@@ -1,20 +1,20 @@
 import torch
 import torch.nn as nn
 
-from core.layers.others.base import weights_init
+from core.layers.others.base import weights_init, resnet20_backbone
 from core.layers.others.layers_em import EmRouting2d
 from core.models import resnet18_dwt_tiny_half
 
 
-class ConvNet(nn.Module):
-    def __init__(self, num_classes, planes=32, num_caps=16, depth=3, bacbone=resnet18_dwt_tiny_half, caps_size=16):
-        super(ConvNet, self).__init__()
+class Model(nn.Module):
+    def __init__(self, num_classes, planes=16, num_caps=16, depth=3, backbone=resnet18_dwt_tiny_half, caps_size=16):
+        super(Model, self).__init__()
 
         self.num_caps = num_caps
         self.caps_size = caps_size
         self.depth = depth
 
-        self.layers = bacbone(backbone=True)
+        self.layers = backbone(backbone=True)
         self.conv_layers = nn.ModuleList()
         self.norm_layers = nn.ModuleList()
 
@@ -26,8 +26,8 @@ class ConvNet(nn.Module):
         final_shape = 4
 
         # EM
-        self.conv_a = nn.Conv2d(8 * planes, num_caps, kernel_size=3, stride=1, padding=1, bias=False)
-        self.conv_pose = nn.Conv2d(8 * planes, num_caps * caps_size, kernel_size=3, stride=1, padding=1, bias=False)
+        self.conv_a = nn.Conv2d(num_caps * planes, num_caps, kernel_size=3, stride=1, padding=1, bias=False)
+        self.conv_pose = nn.Conv2d(num_caps * planes, num_caps * caps_size, kernel_size=3, stride=1, padding=1, bias=False)
         self.bn_a = nn.BatchNorm2d(num_caps)
         self.bn_pose = nn.BatchNorm2d(num_caps * caps_size)
         self.fc = EmRouting2d(num_caps, num_classes, caps_size, kernel_size=final_shape, padding=0)
@@ -52,4 +52,12 @@ class ConvNet(nn.Module):
 
 
 def capsnet_em(num_classes=10, **kwargs):
-    return ConvNet(num_classes)
+    return Model(num_classes)
+
+
+def capsnet_em_routingx1(num_classes=10, **kwargs):
+    return Model(num_classes, depth=1)
+
+
+def capsnet_em_r20_routingx1(num_classes=10, backbone=resnet20_backbone, **kwargs):
+    return Model(num_classes, backbone=backbone, depth=1)
