@@ -5,9 +5,9 @@ from core.layers.others.layers_sr import SelfRouting2d
 from core.models import resnet18_dwt_tiny_half
 
 
-class ConvNet(nn.Module):
+class Model(nn.Module):
     def __init__(self, num_classes, planes=16, num_caps=16, depth=3, backbone=resnet18_dwt_tiny_half, caps_size=16):
-        super(ConvNet, self).__init__()
+        super(Model, self).__init__()
         self.num_caps = num_caps
         self.caps_size = caps_size
         self.depth = depth
@@ -47,8 +47,12 @@ class ConvNet(nn.Module):
 
 
 def capsnet_sr(num_classes=10, **kwargs):
-    return ConvNet(num_classes)
+    return Model(num_classes)
 
 
-def capsnet_sr_r20(num_classes=10, backbone=resnet20_backbone, **kwargs):
-    return ConvNet(num_classes, backbone=backbone)
+def capsnet_sr_routingx1(num_classes=10, **kwargs):
+    return Model(num_classes, depth=1)
+
+
+def capsnet_sr_r20_routingx1(num_classes=10, backbone=resnet20_backbone, **kwargs):
+    return Model(num_classes, backbone=backbone, depth=1)
