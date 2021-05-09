@@ -41,7 +41,7 @@ class Model(nn.Module):
             pose = bn(pose)
 
         a, _ = self.fc(a, pose)
-        out = a.view(a.size(), -1)
+        out = a.view(a.size(0), -1)
         out = out.log()
         return out
 

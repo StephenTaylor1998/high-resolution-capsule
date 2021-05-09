@@ -7,7 +7,7 @@ from core.models import resnet18_dwt_tiny_half
 
 
 class Model(nn.Module):
-    def __init__(self, num_classes, planes=16, num_caps=16, depth=1, backbone=resnet18_dwt_tiny_half, caps_size=16):
+    def __init__(self, num_classes, planes=16, num_caps=16, depth=3, backbone=resnet18_dwt_tiny_half, caps_size=16):
         super(Model, self).__init__()
 
         self.num_caps = num_caps
