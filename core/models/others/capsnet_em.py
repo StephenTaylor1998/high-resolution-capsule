@@ -46,8 +46,10 @@ class Model(nn.Module):
             pose = bn(pose)
 
         a, _ = self.fc(a, pose)
-        out = a.view(a.size(0), -1)
-
+        # to support different input-shape
+        # out = a.view(a.size(0), -1)
+        out = torch.mean(a, dim=[2, 3], keepdim=False)
+        # out = torch.sum(a, dim=[2, 3], keepdim=False)
         return out
 
 
