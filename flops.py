@@ -38,7 +38,7 @@ if __name__ == '__main__':
 
     model = models.__dict__[args.arch](num_classes=args.classes, args=args)
     print(args.shape)
-    inputs = torch.randn(1, 3, 32, 32)
+    inputs = torch.randn(*args.shape)
     macs, params = profile(model, inputs=(inputs,))
     print('='*30)
     print(f"Model Name: {args.arch}")
