@@ -1,17 +1,17 @@
 import torch.nn as nn
-from core.layers.others.base import weights_init
+from core.layers.others.base import weights_init, resnet20_backbone
 from core.layers.others.layers_dr import DynamicRouting2d, squash
 from core.models import resnet18_dwt_tiny_half
 
 
 class ConvNet(nn.Module):
-    def __init__(self, num_classes, planes=32, num_caps=16, depth=3, bacbone=resnet18_dwt_tiny_half, caps_size=16):
+    def __init__(self, num_classes, planes=32, num_caps=16, depth=3, backbone=resnet18_dwt_tiny_half, caps_size=16):
         super(ConvNet, self).__init__()
         self.num_caps = num_caps
         self.caps_size = caps_size
         self.depth = depth
 
-        self.layers = bacbone(backbone=True)
+        self.layers = backbone(backbone=True)
         self.conv_layers = nn.ModuleList()
         self.norm_layers = nn.ModuleList()
 
@@ -52,3 +52,7 @@ class ConvNet(nn.Module):
 
 def capsnet_dr(num_classes=10, **kwargs):
     return ConvNet(num_classes)
+
+
+def capsnet_dr_r20(num_classes=10, backbone=resnet20_backbone, **kwargs):
+    return ConvNet(num_classes, backbone=backbone)
