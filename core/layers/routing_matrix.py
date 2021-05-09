@@ -50,7 +50,8 @@ class Length(nn.Module):
         self.eps = eps
 
     def forward(self, x):
-        return torch.sqrt(torch.sum(torch.square(x / 16.), dim=[2, 3]) + self.eps)
+        return torch.mean(x, dim=[2, 3], keepdim=False)
+        # return torch.sqrt(torch.sum(torch.square(x / 16.), dim=[2, 3]) + self.eps)
 
 
 # if __name__ == '__main__':

@@ -2,6 +2,8 @@ import torch
 from torch import nn
 from typing import Union
 
+from core.layers.transforms.dwt import DWTForward
+
 
 class PartialMatrix(nn.Module):
     def __init__(self, num_capsule: int = None, rate: int = 1, matrix_shape: tuple = (4, 4),
@@ -110,13 +112,52 @@ class CapsFPN(nn.Module):
         return feature_pyramid
 
 
+class PrimaryCaps(nn.Module):
+    def __init__(self, in_channel, out_channel, kernel_size, down_sample_times, num_capsule, capsule_length, out_capsule_last=True):
+        super(PrimaryCaps, self).__init__()
+        self.num_capsule = num_capsule
+        self.capsule_length = capsule_length
+        self.out_capsule_last = out_capsule_last
+
+        self.down = self._make_layer(down_sample_times, in_channel)
+        self.conv = nn.Conv2d(in_channel, out_channel, kernel_size, stride=1, groups=out_channel)
+
+    def compute_shape(self, input_shape, batch_size: int = 1, data_type=torch.float32):
+        inputs = torch.ones((batch_size, *input_shape), dtype=data_type)
+        out = self.forward(inputs)
+        return out.shape[1:]
+
+    def _make_layer(self, down_sample_times: int, channel: int):
+        layer_list = []
+        for i in range(down_sample_times):
+            layer_list.append(nn.Conv2d(channel, channel//4, 1))
+            layer_list.append(DWTForward())
+
+            if i != down_sample_times-1:
+                layer_list.append(nn.BatchNorm2d(channel))
+        return nn.Sequential(*layer_list)
+
+    def forward(self, x):
+        x = self.down(x)
+        x = self.conv(x)
+        x = torch.reshape(x, (x.shape[0], self.num_capsule, self.capsule_length))
+        x = x.permute((0, 1, 2)) if self.out_capsule_last else x
+        return x
+
+
 # if __name__ == '__main__':
-#     inp = torch.ones((1, 16, 4, 4))
+#     from thop import profile
+#     inp = torch.ones((1, 256, 28, 28))
 #     # out = PartialMatrix(4, rate=4)(inp)
 #     # out = GlobalMatrix(8, matrix_shape=(4, 4))(inp)
 #     # out = CondenseTiny(4, rate=4)(inp)
 #     # out = Condense(256, matrix_shape=(4, 4))(inp)
-#     out = CapsFPNTiny(16, matrix_shape=(4, 4))(inp)
+#     # out = CapsFPNTiny(16, matrix_shape=(4, 4))(inp)
 #     # out = CapsFPN([16, 8, 4, 4], matrix_shape=(4, 4))(inp)
-#     print(out.shape)
-#     print(out[0, 0, 0])
+#
+#     macs, params = profile(PrimaryCaps(256, 256, 7, 2, num_capsule=16, capsule_length=16), inputs=(inp,))
+#     # out = PrimaryCaps(16, 16, 7, 2, 16, 8)(inp)
+#     # print(out.shape)
+#     # print(out[0, 0, 0])
+#     print(f"FLOPs: {macs / 1000000000} GFLOPs")
+#     print(f"Params: {params / 1000000} M")
