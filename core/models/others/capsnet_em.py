@@ -3,7 +3,7 @@ import torch.nn as nn
 
 from core.layers.others.base import weights_init, resnet20_backbone
 from core.layers.others.layers_em import EmRouting2d
-from core.models import resnet18_dwt_tiny_half
+from core.models import resnet18_dwt_tiny_half, resnet18_tiny_half
 
 
 class Model(nn.Module):
@@ -58,7 +58,11 @@ def capsnet_em(num_classes=10, **kwargs):
 
 
 def capsnet_em_routingx1(num_classes=10, **kwargs):
-    return Model(num_classes, depth=1)
+    return Model(num_classes, depth=1, backbone=resnet18_tiny_half)
+
+
+def capsnet_em_dwt_routingx1(num_classes=10, **kwargs):
+    return Model(num_classes, depth=1, backbone=resnet18_dwt_tiny_half)
 
 
 def capsnet_em_r20_routingx1(num_classes=10, backbone=resnet20_backbone, **kwargs):

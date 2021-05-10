@@ -4,9 +4,9 @@ __all__ = ['ImageNetNormalize',
            'ImageNetTrainTransform',
            'ImageNetValidationTransform',
            'ImageNetTestTransform',
-           'TinyImageNetTrainTransform',
-           'TinyImageNetvalidationTransform',
-           'TinyImageNetTestTransform',
+           'HRImageNetTrainTransform',
+           'HRImageNetValidationTransform',
+           'HRImageNetTestTransform',
            'MNISTTrainTransform',
            'MNISTValidationTransform',
            'MNISTTestTransform']
@@ -36,29 +36,30 @@ ImageNetTestTransform = transforms.Compose([
     ImageNetNormalize,
 ])
 
-# tiny-imagenet examples
-TinyImageNetTrainTransform = transforms.Compose([
-    transforms.RandomResizedCrop(64),
+# iamgenet examples
+HRImageNetTrainTransform = transforms.Compose([
+    transforms.RandomResizedCrop(512),
     transforms.RandomHorizontalFlip(),
-    # you may remove this line, it's a test
-    transforms.RandomVerticalFlip(),
-    # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     transforms.ToTensor(),
     ImageNetNormalize,
 ])
 
-TinyImageNetvalidationTransform = transforms.Compose([
+HRImageNetValidationTransform = transforms.Compose([
+    transforms.Resize(512),
+    transforms.CenterCrop(512),
     transforms.ToTensor(),
     ImageNetNormalize,
 ])
 
-TinyImageNetTestTransform = transforms.Compose([
+HRImageNetTestTransform = transforms.Compose([
+    transforms.Resize(512),
+    transforms.CenterCrop(512),
     transforms.ToTensor(),
     ImageNetNormalize,
 ])
 
 
-# tiny-imagenet examples
+# mnist
 MNISTTrainTransform = transforms.Compose([
     transforms.RandomRotation(30, center=(14, 14)),
     # transforms.RandomPerspective(),

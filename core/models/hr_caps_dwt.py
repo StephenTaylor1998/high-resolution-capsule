@@ -39,23 +39,16 @@ class ModelMatrix(nn.Module):
     def __init__(self, in_shape, num_classes=10, routing_name_list: Union[list, tuple] = None,
                  backbone=models.resnet50_dwt_tiny_half):
         super(ModelMatrix, self).__init__()
-
         self.backbone = backbone(backbone=True)
         shape = self.backbone.compute_shape(in_shape)
-        # (3, 224, 224)
-        self.primary_caps = PrimaryCaps(shape[0], shape[0], 7, 2, num_capsule=shape[0] // 8, capsule_length=8)
-        # (3, 32, 32)
-        # self.primary_caps = PrimaryCaps(in_channel=shape[0], out_channel=shape[0], kernel_size=shape[-1],
-        #                                 num_capsule=shape[0] // 8, capsule_length=8)
+        self.primary_caps = PrimaryCaps(shape[0], shape[0], 2, 2, num_capsule=shape[0] // 16, capsule_shape=(4, 4))
         shape = self.primary_caps.compute_shape(shape)
-        self.routing = RoutingMatrix(shape[0] // 2, num_classes, routing_name_list)
+        self.routing = RoutingMatrix(shape[2], num_classes, routing_name_list)
         self.length = LengthMatrix()
 
     def forward(self, x):
         x = self.backbone(x)
         x = self.primary_caps(x)
-        x = torch.transpose(x, 1, 2)
-        x = torch.reshape(x, (x.shape[0], -1, 4, 4))
         x = self.routing(x)
         classes = self.length(x)
         return classes
@@ -72,12 +65,13 @@ def hr_caps_r_fpn(num_classes=10, args=None, **kwargs):
     backbone = models.__dict__[args.backbone]
     return ModelMatrix(in_shape, num_classes, routing_name_list, backbone)
 
-# if __name__ == '__main__':
-#     inp = torch.ones((1, 3, 32, 32))
-#
-#     # out = RoutingBlockMatrix(32, 'FPN')(inp)
-#     # out = RoutingBlockMatrix(32, 'Tiny_FPN')(inp)
-#     # out = RoutingMatrix(32, 10, ['Tiny_FPN'])(inp)
-#     out = ModelMatrix((3, 32, 32))(inp)
-#     print(out.shape)
-#     print(out)
+
+if __name__ == '__main__':
+    inp = torch.ones((1, 3, 512, 512))
+
+    # out = RoutingBlockMatrix(32, 'FPN')(inp)
+    # out = RoutingBlockMatrix(32, 'Tiny_FPN')(inp)
+    # out = RoutingMatrix(32, 10, ['Tiny_FPN'])(inp)
+    out = ModelMatrix((3, 512, 512), routing_name_list = ['Tiny_FPN'])(inp)
+    print(out.shape)
+    print(out)

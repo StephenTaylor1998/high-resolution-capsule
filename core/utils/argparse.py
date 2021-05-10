@@ -14,7 +14,7 @@ def arg_parse():
                         help='path to dataset')
     parser.add_argument('-d', '--data_format', metavar='DATA_FORMAT', default='imagefolder',
                         choices=['image_folder', 'imagenet', 'cifar10', 'cifar100', 'mnist',
-                                 'fashion_mnist', 'small_norb'],
+                                 'fashion_mnist', 'small_norb', 'image_folder_high_resolution'],
                         help='data format: (default: imagefolder)')
     parser.add_argument('-a', '--arch', metavar='ARCH', default='resnet18',
                         choices=model_names,
@@ -80,7 +80,7 @@ def arg_parse():
     parser.add_argument('--routing-iter', default=3, type=int, help='Capsule routing iter.')
     parser.add_argument('--capsule-arch', default=[64, 8, 16, 16, 5], nargs='+', type=int,
                         help='Capsule arch.')
-    parser.add_argument('--routing-name-list', default=["FPN"], nargs='+', type=str,
+    parser.add_argument('--routing-name-list', default=[None], nargs='+', type=str,
                         help='FPN routing.')
-    parser.add_argument('--backbone', default="resnet50_dwt_tiny_half", type=str, help='FPN routing.')
+    parser.add_argument('--backbone', default=None, type=str, help='FPN routing.')
     return parser

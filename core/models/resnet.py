@@ -4,6 +4,7 @@ import torch.nn as nn
 from core.layers.resnet import \
     BasicBlock, \
     Bottleneck, \
+    TinyBasicBlock, \
     BasicBlockDWT, \
     BottleneckDWT, \
     TinyBlockDWT, \
@@ -77,6 +78,15 @@ def resnet34_cifar(block=BasicBlock, num_blocks=None, num_classes=10, half=False
 def resnet50_cifar(block=Bottleneck, num_blocks=None, num_classes=10, half=False, backbone=False, **kwargs):
     if num_blocks is None:
         num_blocks = [3, 4, 6, 3]
+    if backbone:
+        return ResNetBackbone(block, num_blocks, half=half)
+    else:
+        return ResNet(block, num_blocks, num_classes=num_classes, half=half)
+
+
+def resnet18_tiny_half(block=TinyBasicBlock, num_blocks=None, num_classes=10, half=True, backbone=False, **kwargs):
+    if num_blocks is None:
+        num_blocks = [2, 2, 2, 2]
     if backbone:
         return ResNetBackbone(block, num_blocks, half=half)
     else:

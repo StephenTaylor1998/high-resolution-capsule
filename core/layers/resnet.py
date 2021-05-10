@@ -30,6 +30,33 @@ class BasicBlock(nn.Module):
         return out
 
 
+class TinyBasicBlock(nn.Module):
+    expansion = 1
+
+    def __init__(self, in_planes, planes, stride=1):
+        super(TinyBasicBlock, self).__init__()
+        self.in_planes = in_planes
+        self.planes = planes
+        self.stride = stride
+        self.conv1 = nn.Conv2d(self.in_planes, planes//4, kernel_size=3, stride=stride, padding=1, bias=False)
+        self.bn1 = nn.BatchNorm2d(planes//4)
+        self.conv2 = nn.Conv2d(planes//4, planes, kernel_size=3, stride=1, padding=1, bias=False)
+        self.bn2 = nn.BatchNorm2d(self.planes)
+        self.relu = nn.ReLU()
+        self.shortcut = nn.Sequential()
+        if self.stride != 1 or self.in_planes != self.expansion * self.planes:
+            self.shortcut = nn.Sequential(
+                nn.Conv2d(self.in_planes, self.expansion * self.planes, kernel_size=1, stride=self.stride, bias=False),
+                nn.BatchNorm2d(self.expansion * self.planes))
+
+    def forward(self, inputs):
+        out = self.relu(self.bn1(self.conv1(inputs)))
+        out = self.bn2(self.conv2(out))
+        out += self.shortcut(inputs)
+        out = self.relu(out)
+        return out
+
+
 class Bottleneck(nn.Module):
     expansion = 4
 
