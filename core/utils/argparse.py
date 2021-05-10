@@ -80,7 +80,7 @@ def arg_parse():
     parser.add_argument('--routing-iter', default=3, type=int, help='Capsule routing iter.')
     parser.add_argument('--capsule-arch', default=[64, 8, 16, 16, 5], nargs='+', type=int,
                         help='Capsule arch.')
-    parser.add_argument('--routing-name-list', default=[None], nargs='+', type=str,
+    parser.add_argument('--routing-name-list', default=None, nargs='+', type=str,
                         help='FPN routing.')
     parser.add_argument('--backbone', default=None, type=str, help='FPN routing.')
     return parser

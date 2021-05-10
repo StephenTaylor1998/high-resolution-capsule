@@ -6,15 +6,14 @@ def copy_weights(arg, epoch):
     model_name = arg.arch
     epochs = arg.epochs
     batch_size = arg.batch_size
-    learning_rate = arg.lr
-    datasets = arg.data_format.strip()
-    fpn = arg.routing_name_list if arg.routing_name_list is not None else ['']
-    backbone = arg.backbone if arg.backbone is not None else ['']
+    lr = arg.lr
+    ds = arg.data_format.strip()
+    fpn = arg.routing_name_list if arg.routing_name_list is not None else ''
+    backbone = arg.backbone if arg.backbone is not None else ''
 
     # folder_name = '%s_epoch%d_bs%d_lr%.1e_%s' % \
     #               (model_name, epochs, batch_size, learning_rate, datasets)
-    folder_name = f"{model_name}_epoch{epochs}_bs{batch_size}_lr{learning_rate}_{datasets}" \
-                  f"{list_to_str(fpn)}{list_to_str([backbone])}"
+    folder_name = f"{model_name}_epoch{epochs}_bs{batch_size}_lr{lr}_{ds}{list_to_str(fpn)}{backbone}"
 
     # print(folder_name)
     folder_path = os.path.join('./data/weights', folder_name)
@@ -47,4 +46,4 @@ def list_to_str(str_list: list):
             return out
         out += "_" + item
 
-    return out
+    return str(out)

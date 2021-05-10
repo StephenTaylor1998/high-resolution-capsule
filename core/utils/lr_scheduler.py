@@ -11,11 +11,11 @@ def imagenet(optimizer, epoch, args):
 def cifar(optimizer, epoch, args):
     if epoch < 10:
         lr = args.lr * (epoch/10)
-    elif epoch < 120:
+    elif epoch < 100:
         lr = args.lr
-    elif epoch < 220:
+    elif epoch < 170:
         lr = args.lr * 0.1
-    elif epoch < 270:
+    elif epoch < 220:
         lr = args.lr * 0.01
     else:
         lr = args.lr * 0.001
