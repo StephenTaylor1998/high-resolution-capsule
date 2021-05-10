@@ -15,7 +15,8 @@ class RoutingBlockMatrix(nn.Module):
         else:
             print(f"FPN name {routing_name} should in ['Tiny_FPN', 'FPN']")
             raise NotImplementedError
-        self.norm = nn.BatchNorm2d(num_capsule)
+        # self.norm = nn.BatchNorm2d(num_capsule)
+        self.norm = nn.LayerNorm([num_capsule, *self.fpn.matrix_shape])
 
     def forward(self, x):
         feature_pyramid = self.fpn(x)
@@ -50,18 +51,20 @@ class Length(nn.Module):
         self.eps = eps
 
     def forward(self, x):
-        return torch.sqrt(torch.sum(torch.square(x / 16.), dim=[2, 3]) + self.eps)
+        return torch.mean(x, dim=[1, 2, -1, -2], keepdim=False)
+        # return torch.sqrt(torch.sum(torch.square(x / 16.), dim=[2, 3]) + self.eps)
 
 
 # if __name__ == '__main__':
-#     inp = torch.ones((1, 32, 4, 4))
+#     # inp = torch.ones((1, 32, 4, 4))
+#     inp = torch.ones((1, 28, 28, 32, 4, 4))
 #
 #     # out = RoutingBlockMatrix(32, 'FPN')(inp)
 #     # out = RoutingBlockMatrix(32, 'Tiny_FPN')(inp)
 #     # out = RoutingMatrix(32, 10, ['Tiny_FPN'])(inp)
 #     out = RoutingMatrix(32, 10, ['FPN'])(inp)
 #     print(out.shape)
-#     print(out[0, 0, 0])
+#
 #     out = Length()(out)
 #     print(out.shape)
-#     print(out)
+

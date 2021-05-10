@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 from core.layers.others.base import weights_init, resnet20_backbone
 from core.layers.others.layers_dr import DynamicRouting2d, squash
@@ -46,6 +47,9 @@ class Model(nn.Module):
             pose = m(pose)
 
         out = self.fc(pose)
+        # to support different input-shape
+        # out = torch.sum(out, dim=[2, 3], keepdim=False)
+        out = torch.mean(out, dim=[2, 3], keepdim=False)
         out = out.view(b, -1, self.caps_size)
         out = out.norm(dim=-1)
         return out

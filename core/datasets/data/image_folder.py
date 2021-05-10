@@ -17,16 +17,19 @@ def classify_dataset(data_dir, transform, not_strict=False):
 
 # train dataset example for image-net
 def train_dataset(data_dir, transform=ImageNetTrainTransform):
+    data_dir = os.path.join(data_dir, 'train')
     return datasets.ImageFolder(data_dir, transform)
 
 
 # val dataset example for image-net
 def val_dataset(data_dir, transform=ImageNetValidationTransform):
+    data_dir = os.path.join(data_dir, 'val')
     return datasets.ImageFolder(data_dir, transform)
 
 
 # test dataset example for image-net
 def test_dataset(data_dir, transform=ImageNetTestTransform):
+    data_dir = os.path.join(data_dir, 'val')
     return datasets.ImageFolder(data_dir, transform)
 
 
