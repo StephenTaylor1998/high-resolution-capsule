@@ -1,8 +1,13 @@
 import torch
-
 from core import models
 from thop import profile
 import argparse
+
+
+def get_parameter_number(net):
+    total_num = sum(p.numel() for p in net.parameters())
+    trainable_num = sum(p.numel() for p in net.parameters() if p.requires_grad)
+    return total_num, trainable_num
 
 
 if __name__ == '__main__':
@@ -39,9 +44,11 @@ if __name__ == '__main__':
     model = models.__dict__[args.arch](num_classes=args.classes, args=args)
     print(args.shape)
     inputs = torch.randn(*args.shape)
-    macs, params = profile(model, inputs=(inputs,))
+    macs, _ = profile(model, inputs=(inputs,))
+    total_num, trainable_num = get_parameter_number(model)
     print('='*30)
     print(f"Model Name: {args.arch}")
     print(f"FLOPs: {macs/1000000000} GFLOPs")
-    print(f"Params: {params/1000000} M")
+    print(f"total_num: {total_num / 1000000} M")
+    print(f"trainable: {trainable_num / 1000000} M")
     print('=' * 30)

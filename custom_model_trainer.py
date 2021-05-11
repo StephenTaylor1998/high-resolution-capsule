@@ -11,7 +11,6 @@ import torch.utils.data
 import torch.utils.data.distributed
 
 from core.datasets.data.image_folder import classify_dataset
-# from core.engine.classify import main_worker
 from core.engine.distributed_engine import main_worker
 from core.models.efficientnet import b7
 from core.utils.argparse import arg_parse

@@ -16,8 +16,8 @@ echo "Training..."
 #python train_imagenet.py -d cifar10 -a capsnet_em_routingx1 -b 256 -j 20 -c 10 --epoch 300 --dist-url 'tcp://127.0.0.1:8889' --dist-backend 'nccl' \
 #--multiprocessing-distributed --world-size 1 --rank 0 ./data/dataset/ --lr-scheduler cifar
 
-#python train_imagenet.py -d cifar10 -a capsnet_sr_routingx1 -b 256 -j 20 -c 10 --epoch 300 --dist-url 'tcp://127.0.0.1:8889' --dist-backend 'nccl' \
-#--multiprocessing-distributed --world-size 1 --rank 0 ./data/dataset/ --lr-scheduler cifar
+python train_imagenet.py -d cifar10 -a capsnet_sr_routingx1 -b 256 -j 20 -c 10 --epoch 300 --dist-url 'tcp://127.0.0.1:8889' --dist-backend 'nccl' \
+--multiprocessing-distributed --world-size 1 --rank 0 ./data/dataset/ --lr-scheduler cifar
 
 #python train_imagenet.py -d cifar10 -a capsnet_dr_routingx1 -b 256 -j 20 -c 10 --epoch 300 --dist-url 'tcp://127.0.0.1:8889' --dist-backend 'nccl' \
 #--multiprocessing-distributed --world-size 1 --rank 0 ./data/dataset/ --lr-scheduler cifar
@@ -27,5 +27,8 @@ python train_imagenet.py -d image_folder -a hr_caps_r_fpn -b 512 -j 20 -c 10 --e
 --multiprocessing-distributed --world-size 1 --rank 0 ./data/dataset/sub_imagenet --lr-scheduler imagenet --backbone resnet18_dwt_tiny_half \
 --routing-name-list FPN FPN FPN --in-shape 3 224 224
 
+python train_imagenet.py -d cifar10 -a hr_caps_tiny_fpn -b 512 -j 20 -c 10 --epoch 250 --dist-url 'tcp://127.0.0.1:8889' --dist-backend 'nccl' \
+--multiprocessing-distributed --world-size 1 --rank 0 ./data/dataset/ --lr-scheduler cifar \
+--routing-name-list FPN FPN FPN --in-shape 3 32 32
 
 echo "done."
