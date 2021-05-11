@@ -82,5 +82,5 @@ def arg_parse():
                         help='Capsule arch.')
     parser.add_argument('--routing-name-list', default=None, nargs='+', type=str,
                         help='FPN routing.')
-    parser.add_argument('--backbone', default=None, type=str, help='FPN routing.')
+    parser.add_argument('--backbone', default=None, type=str, help='BackBone.')
     return parser

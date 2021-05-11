@@ -4,7 +4,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-
 class PrimaryCapsules2d(nn.Module):
     """Primary Capsule Layer"""
 

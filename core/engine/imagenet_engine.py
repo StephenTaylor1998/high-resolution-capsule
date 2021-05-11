@@ -155,4 +155,7 @@ def main_worker(gpu, ngpus_per_node, args):
                 'best_acc1': best_acc1,
                 'optimizer': optimizer.state_dict(),
             }, is_best)
-            copy_weights(args, epoch)
+            if is_best:
+                copy_weights(args, epoch)
+
+    copy_weights(args, args.epochs)
