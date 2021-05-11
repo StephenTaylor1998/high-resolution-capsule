@@ -1,5 +1,7 @@
 import torch
 import torch.nn as nn
+
+from core import models
 from core.layers.others.base import weights_init, resnet20_backbone
 from core.layers.others.layers_sr import SelfRouting2d
 from core.models import resnet18_dwt_tiny_half, resnet10_tiny_half
@@ -46,16 +48,19 @@ class Model(nn.Module):
         return out
 
 
-def capsnet_sr_depthx1(num_classes=10, **kwargs):
-    return Model(num_classes, depth=1)
+def capsnet_sr_depthx1(num_classes=10, args=None, **kwargs):
+    backbone = models.__dict__[args.backbone]
+    return Model(num_classes, depth=1, backbone=backbone)
 
 
-def capsnet_sr_depthx2(num_classes=10, **kwargs):
-    return Model(num_classes, depth=2)
+def capsnet_sr_depthx2(num_classes=10, args=None, **kwargs):
+    backbone = models.__dict__[args.backbone]
+    return Model(num_classes, depth=2, backbone=backbone)
 
 
-def capsnet_sr_depthx3(num_classes=10, **kwargs):
-    return Model(num_classes, depth=3)
+def capsnet_sr_depthx3(num_classes=10, args=None, **kwargs):
+    backbone = models.__dict__[args.backbone]
+    return Model(num_classes, depth=3, backbone=backbone)
 
 
 def capsnet_sr_r10_depth_x2(num_classes=10, backbone=resnet10_tiny_half, **kwargs):
