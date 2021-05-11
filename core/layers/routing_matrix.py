@@ -6,36 +6,38 @@ from core.layers.operator_matrix import CapsFPN, CapsFPNTiny, GlobalMatrix
 
 
 class RoutingBlockMatrix(nn.Module):
-    def __init__(self, num_capsule, routing_name: str):
+    def __init__(self, num_capsule, routing_name: str, rate_list: Union[list, tuple] = None):
         super(RoutingBlockMatrix, self).__init__()
         if routing_name == "FPN":
-            self.fpn = CapsFPN((num_capsule // 2, num_capsule // 4, num_capsule // 8, num_capsule // 8))
+            if rate_list is None:
+                rate_list = [num_capsule // 2, num_capsule // 4, num_capsule // 8, num_capsule // 8]
+            self.fpn = CapsFPN(rate_list)
         elif routing_name == "Tiny_FPN":
-            self.fpn = CapsFPNTiny(num_capsule, rate_list=[2, 2, 2, 1])
+            rate_list = [2, 2, 2, 1] if rate_list is None else rate_list
+            self.fpn = CapsFPNTiny(num_capsule, rate_list=rate_list)
         else:
             print(f"FPN name {routing_name} should in ['Tiny_FPN', 'FPN']")
             raise NotImplementedError
-        # self.norm = nn.BatchNorm2d(num_capsule)
+
         self.norm = nn.LayerNorm([num_capsule, *self.fpn.matrix_shape])
 
     def forward(self, x):
         feature_pyramid = self.fpn(x)
         feature_pyramid = self.norm(feature_pyramid)
-        # caps_similarity = self.caps_similarity(feature_pyramid)
-        # feature_pyramid = feature_pyramid * caps_similarity
         return feature_pyramid
 
 
 class RoutingMatrix(nn.Module):
-    def __init__(self, num_capsule, num_classes=10, routing_name_list: Union[list, tuple] = None):
+    def __init__(self, num_capsule, num_classes=10, routing_name_list: Union[list, tuple] = None,
+                 rate_list: Union[list, tuple] = None):
         super(RoutingMatrix, self).__init__()
-        self.routings = self._make_routing(RoutingBlockMatrix, num_capsule, routing_name_list)
+        self.routings = self._make_routing(RoutingBlockMatrix, num_capsule, routing_name_list, rate_list)
         self.final_mapping = GlobalMatrix(num_classes)
 
-    def _make_routing(self, block, num_capsule, routing_name_list: list):
+    def _make_routing(self, block, num_capsule, routing_name_list: list, rate_list: Union[list, tuple]):
         layer_list = []
         for routing_name in routing_name_list:
-            layer_list.append(block(num_capsule, routing_name))
+            layer_list.append(block(num_capsule, routing_name, rate_list))
 
         return nn.Sequential(*layer_list)
 

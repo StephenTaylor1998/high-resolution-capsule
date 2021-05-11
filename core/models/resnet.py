@@ -84,15 +84,6 @@ def resnet50_cifar(block=Bottleneck, num_blocks=None, num_classes=10, half=False
         return ResNet(block, num_blocks, num_classes=num_classes, half=half)
 
 
-def resnet18_tiny_half(block=TinyBasicBlock, num_blocks=None, num_classes=10, half=True, backbone=False, **kwargs):
-    if num_blocks is None:
-        num_blocks = [2, 2, 2, 2]
-    if backbone:
-        return ResNetBackbone(block, num_blocks, half=half)
-    else:
-        return ResNet(block, num_blocks, num_classes=num_classes, half=half)
-
-
 def resnet18_dwt_half(block=BasicBlockDWT, num_blocks=None, num_classes=10, half=True, backbone=False, **kwargs):
     if num_blocks is None:
         num_blocks = [2, 2, 2, 2]
@@ -168,6 +159,34 @@ def resnet34_dwt_tiny_half(block=TinyBlockDWT, num_blocks=None, num_classes=10, 
 def resnet50_dwt_tiny_half(block=TinyBottleDWT, num_blocks=None, num_classes=10, half=True, backbone=False, **kwargs):
     if num_blocks is None:
         num_blocks = [3, 4, 6, 3]
+    if backbone:
+        return ResNetBackbone(block, num_blocks, half=half)
+    else:
+        return ResNet(block, num_blocks, num_classes=num_classes, half=half)
+
+
+def resnet18_tiny_half(block=TinyBasicBlock, num_blocks=None, num_classes=10, half=True, backbone=False, **kwargs):
+    if num_blocks is None:
+        num_blocks = [2, 2, 2, 2]
+    if backbone:
+        return ResNetBackbone(block, num_blocks, half=half)
+    else:
+        return ResNet(block, num_blocks, num_classes=num_classes, half=half)
+
+
+# resnet 10 serial
+def resnet10_tiny_half(block=TinyBasicBlock, num_blocks=None, num_classes=10, half=True, backbone=False, **kwargs):
+    if num_blocks is None:
+        num_blocks = [1, 1, 1, 1]
+    if backbone:
+        return ResNetBackbone(block, num_blocks, half=half)
+    else:
+        return ResNet(block, num_blocks, num_classes=num_classes, half=half)
+
+
+def resnet10_dwt_tiny_half(block=TinyBlockDWT, num_blocks=None, num_classes=10, half=True, backbone=False, **kwargs):
+    if num_blocks is None:
+        num_blocks = [1, 1, 1, 1]
     if backbone:
         return ResNetBackbone(block, num_blocks, half=half)
     else:

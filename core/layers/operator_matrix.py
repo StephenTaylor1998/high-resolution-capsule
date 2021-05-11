@@ -55,7 +55,6 @@ class Condense(nn.Module):
         super(Condense, self).__init__()
         self.rate = nn.Parameter(torch.tensor(num_capsule, dtype=torch.float32), requires_grad=False)
         self.dense_extraction = GlobalMatrix(num_capsule, matrix_shape, init_mode=init_mode)
-        # self.normal = nn.BatchNorm2d(num_capsule)
         self.normal = nn.LayerNorm([num_capsule, *matrix_shape])
         # self.activation = nn.ELU()
         self.activation = nn.Tanh()
