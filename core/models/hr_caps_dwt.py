@@ -52,6 +52,13 @@ def hr_caps_r_fpn(num_classes=10, args=None, **kwargs):
     return HRCaps(in_shape, num_classes, routing_name_list, backbone)
 
 
+def lr_caps_r_fpn(num_classes=10, args=None, **kwargs):
+    in_shape = (3, 32, 32) if args.in_shape is None else args.in_shape
+    routing_name_list = ['Tiny_FPN'] if args.routing_name_list is None else args.routing_name_list
+    backbone = models.__dict__[args.backbone]
+    return HRCapsTiny(in_shape, num_classes, routing_name_list, backbone)
+
+
 def hr_caps_r10_fpn(num_classes=10, args=None, **kwargs):
     in_shape = (3, 32, 32) if args.in_shape is None else args.in_shape
     routing_name_list = ['Tiny_FPN'] if args.routing_name_list is None else args.routing_name_list
