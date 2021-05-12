@@ -9,7 +9,8 @@ from core.layers.resnet import \
     BottleneckDWT, \
     TinyBlockDWT, \
     TinyBottleDWT, \
-    ResNetBackbone
+    ResNetBackbone, \
+    ResBlockLR
 
 
 class ResNet(nn.Module):
@@ -175,19 +176,37 @@ def resnet18_tiny_half(block=TinyBasicBlock, num_blocks=None, num_classes=10, ha
 
 
 # resnet 10 serial
+# def resnet10_tiny_half(block=TinyBasicBlock, num_blocks=None, num_classes=10, half=True, backbone=False, **kwargs):
+#     if num_blocks is None:
+#         num_blocks = [1, 1, 1, 1]
+#     if backbone:
+#         return ResNetBackbone(block, num_blocks, half=half)
+#     else:
+#         return ResNet(block, num_blocks, num_classes=num_classes, half=half)
+
+
+# def resnet10_dwt_tiny_half(block=TinyBlockDWT, num_blocks=None, num_classes=10, half=True, backbone=False, **kwargs):
+#     if num_blocks is None:
+#         num_blocks = [1, 1, 1, 1]
+#     if backbone:
+#         return ResNetBackbone(block, num_blocks, half=half)
+#     else:
+#         return ResNet(block, num_blocks, num_classes=num_classes, half=half)
+
+
 def resnet10_tiny_half(block=TinyBasicBlock, num_blocks=None, num_classes=10, half=True, backbone=False, **kwargs):
     if num_blocks is None:
         num_blocks = [1, 1, 1, 1]
     if backbone:
-        return ResNetBackbone(block, num_blocks, half=half)
+        return ResBlockLR(block, num_blocks, half=True)
     else:
-        return ResNet(block, num_blocks, num_classes=num_classes, half=half)
+        raise NotImplemented
 
 
 def resnet10_dwt_tiny_half(block=TinyBlockDWT, num_blocks=None, num_classes=10, half=True, backbone=False, **kwargs):
     if num_blocks is None:
         num_blocks = [1, 1, 1, 1]
     if backbone:
-        return ResNetBackbone(block, num_blocks, half=half)
+        return ResBlockLR(block, num_blocks, half=True)
     else:
-        return ResNet(block, num_blocks, num_classes=num_classes, half=half)
+        raise NotImplemented
