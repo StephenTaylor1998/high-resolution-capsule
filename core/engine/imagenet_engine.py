@@ -96,6 +96,7 @@ def main_worker(gpu, ngpus_per_node, args):
     if args.distributed:
         train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset)
         val_sampler = torch.utils.data.distributed.DistributedSampler(val_dataset)
+        # val_sampler = None
     else:
         train_sampler = None
         val_sampler = None
@@ -121,10 +122,10 @@ def main_worker(gpu, ngpus_per_node, args):
             batch_size=args.batch_size, shuffle=False,
             num_workers=args.workers, pin_memory=True)
 
-        validate(train_loader, model, criterion, args)
-        print('TEST IN TRAIN SET')
-        validate(val_loader, model, criterion, args)
-        print('TEST IN VAL SET')
+        # validate(train_loader, model, criterion, args)
+        # print('TEST IN TRAIN SET')
+        # validate(val_loader, model, criterion, args)
+        # print('TEST IN VAL SET')
         validate(test_loader, model, criterion, args)
         print('TEST IN TEST SET')
         return
