@@ -12,7 +12,6 @@ class HRCaps(nn.Module):
                  backbone=models.resnet50_dwt_tiny_half):
         super(HRCaps, self).__init__()
         self.backbone = backbone(backbone=True, in_channel=in_shape[0])
-        print(in_shape)
         shape = self.backbone.compute_shape(in_shape)
         self.primary_caps = PrimaryCaps(shape[0], shape[0], 2, 2, num_capsule=shape[0] // 16, capsule_shape=(4, 4))
         shape = self.primary_caps.compute_shape(shape)
