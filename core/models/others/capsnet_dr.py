@@ -7,13 +7,14 @@ from core.layers.others.base import weights_init
 
 
 class Model(nn.Module):
-    def __init__(self, num_classes, planes=16, num_caps=16, depth=1, backbone=resnet18_dwt_tiny_half, caps_size=16):
+    def __init__(self, num_classes, planes=16, num_caps=16, depth=1, backbone=resnet18_dwt_tiny_half, caps_size=16,
+                 in_shape=(3, 32, 32)):
         super(Model, self).__init__()
         self.num_caps = num_caps
         self.caps_size = caps_size
         self.depth = depth
 
-        self.layers = backbone(backbone=True)
+        self.layers = backbone(backbone=True, in_channel=in_shape[0])
         self.conv_layers = nn.ModuleList()
         self.norm_layers = nn.ModuleList()
 
@@ -56,19 +57,19 @@ class Model(nn.Module):
 
 
 def capsnet_dr_depthx1(num_classes=10, args=None, **kwargs):
+    in_shape = (3, 32, 32) if args.in_shape is None else args.in_shape
     backbone = models.__dict__[args.backbone]
-    return Model(num_classes, depth=1, backbone=backbone)
+    return Model(num_classes, depth=1, backbone=backbone, in_shape=in_shape)
 
 
 def capsnet_dr_depthx2(num_classes=10, args=None, **kwargs):
+    in_shape = (3, 32, 32) if args.in_shape is None else args.in_shape
     backbone = models.__dict__[args.backbone]
-    return Model(num_classes, depth=2, backbone=backbone)
+    return Model(num_classes, depth=2, backbone=backbone, in_shape=in_shape)
 
 
 def capsnet_dr_depthx3(num_classes=10, args=None, **kwargs):
+    in_shape = (3, 32, 32) if args.in_shape is None else args.in_shape
     backbone = models.__dict__[args.backbone]
-    return Model(num_classes, depth=3, backbone=backbone)
+    return Model(num_classes, depth=3, backbone=backbone, in_shape=in_shape)
 
-
-def capsnet_dr_r10_depth_x2(num_classes=10, backbone=resnet10_tiny_half, **kwargs):
-    return Model(num_classes, backbone=backbone, depth=2)

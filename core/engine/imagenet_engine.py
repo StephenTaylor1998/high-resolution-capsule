@@ -96,6 +96,7 @@ def main_worker(gpu, ngpus_per_node, args):
     if args.distributed:
         train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset)
         val_sampler = torch.utils.data.distributed.DistributedSampler(val_dataset)
+        # val_sampler = None
     else:
         train_sampler = None
         val_sampler = None

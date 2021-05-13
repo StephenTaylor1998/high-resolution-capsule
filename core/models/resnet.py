@@ -14,10 +14,10 @@ from core.layers.resnet import \
 
 
 class ResNet(nn.Module):
-    def __init__(self, block, num_blocks, num_classes=10, half=True):
+    def __init__(self, block, num_blocks, num_classes=10, half=True, in_channel=3):
         super(ResNet, self).__init__()
         self.in_planes = 64
-        self.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1)
+        self.conv1 = nn.Conv2d(in_channel, 64, kernel_size=3, stride=1, padding=1)
         self.bn1 = nn.BatchNorm2d(64)
         self.relu = nn.ReLU()
         if half:
@@ -58,155 +58,151 @@ class ResNet(nn.Module):
         return out
 
 
-def resnet18_cifar(block=BasicBlock, num_blocks=None, num_classes=10, half=False, backbone=False, **kwargs):
+def resnet18_cifar(block=BasicBlock, num_blocks=None, num_classes=10,
+                   half=False, backbone=False, in_channel=3, **kwargs):
     if num_blocks is None:
         num_blocks = [2, 2, 2, 2]
     if backbone:
-        return ResNetBackbone(block, num_blocks, half=half)
+        return ResNetBackbone(block, num_blocks, half=half, in_channel=in_channel)
     else:
-        return ResNet(block, num_blocks, num_classes=num_classes, half=half)
+        return ResNet(block, num_blocks, num_classes=num_classes, half=half, in_channel=in_channel)
 
 
-def resnet34_cifar(block=BasicBlock, num_blocks=None, num_classes=10, half=False, backbone=False, **kwargs):
+def resnet34_cifar(block=BasicBlock, num_blocks=None, num_classes=10,
+                   half=False, backbone=False, in_channel=3, **kwargs):
     if num_blocks is None:
         num_blocks = [3, 4, 6, 3]
     if backbone:
-        return ResNetBackbone(block, num_blocks, half=half)
+        return ResNetBackbone(block, num_blocks, half=half, in_channel=in_channel)
     else:
-        return ResNet(block, num_blocks, num_classes=num_classes, half=half)
+        return ResNet(block, num_blocks, num_classes=num_classes, half=half, in_channel=in_channel)
 
 
-def resnet50_cifar(block=Bottleneck, num_blocks=None, num_classes=10, half=False, backbone=False, **kwargs):
+def resnet50_cifar(block=Bottleneck, num_blocks=None, num_classes=10,
+                   half=False, backbone=False, in_channel=3, **kwargs):
     if num_blocks is None:
         num_blocks = [3, 4, 6, 3]
     if backbone:
-        return ResNetBackbone(block, num_blocks, half=half)
+        return ResNetBackbone(block, num_blocks, half=half, in_channel=in_channel)
     else:
-        return ResNet(block, num_blocks, num_classes=num_classes, half=half)
+        return ResNet(block, num_blocks, num_classes=num_classes, half=half, in_channel=in_channel)
 
 
-def resnet18_dwt_half(block=BasicBlockDWT, num_blocks=None, num_classes=10, half=True, backbone=False, **kwargs):
+def resnet18_dwt_half(block=BasicBlockDWT, num_blocks=None, num_classes=10,
+                      half=False, backbone=False, in_channel=3, **kwargs):
     if num_blocks is None:
         num_blocks = [2, 2, 2, 2]
     if backbone:
-        return ResNetBackbone(block, num_blocks, half=half)
+        return ResNetBackbone(block, num_blocks, half=half, in_channel=in_channel)
     else:
-        return ResNet(block, num_blocks, num_classes=num_classes, half=half)
+        return ResNet(block, num_blocks, num_classes=num_classes, half=half, in_channel=in_channel)
 
 
-def resnet34_dwt_half(block=BasicBlockDWT, num_blocks=None, num_classes=10, half=True, backbone=False, **kwargs):
+def resnet34_dwt_half(block=BasicBlockDWT, num_blocks=None, num_classes=10,
+                      half=False, backbone=False, in_channel=3, **kwargs):
     if num_blocks is None:
         num_blocks = [3, 4, 6, 3]
     if backbone:
-        return ResNetBackbone(block, num_blocks, half=half)
+        return ResNetBackbone(block, num_blocks, half=half, in_channel=in_channel)
     else:
-        return ResNet(block, num_blocks, num_classes=num_classes, half=half)
+        return ResNet(block, num_blocks, num_classes=num_classes, half=half, in_channel=in_channel)
 
 
-def resnet50_dwt_half(block=BottleneckDWT, num_blocks=None, num_classes=10, half=True, backbone=False, **kwargs):
+def resnet50_dwt_half(block=BottleneckDWT, num_blocks=None, num_classes=10,
+                      half=False, backbone=False, in_channel=3, **kwargs):
     if num_blocks is None:
         num_blocks = [3, 4, 6, 3]
     if backbone:
-        return ResNetBackbone(block, num_blocks, half=half)
+        return ResNetBackbone(block, num_blocks, half=half, in_channel=in_channel)
     else:
-        return ResNet(block, num_blocks, num_classes=num_classes, half=half)
+        return ResNet(block, num_blocks, num_classes=num_classes, half=half, in_channel=in_channel)
 
 
-def resnet18_dwt_tiny(block=TinyBlockDWT, num_blocks=None, num_classes=10, half=False, backbone=False, **kwargs):
+def resnet18_dwt_tiny(block=TinyBlockDWT, num_blocks=None, num_classes=10,
+                      half=False, backbone=False, in_channel=3, **kwargs):
     if num_blocks is None:
         num_blocks = [2, 2, 2, 2]
     if backbone:
-        return ResNetBackbone(block, num_blocks, half=half)
+        return ResNetBackbone(block, num_blocks, half=half, in_channel=in_channel)
     else:
-        return ResNet(block, num_blocks, num_classes=num_classes, half=half)
+        return ResNet(block, num_blocks, num_classes=num_classes, half=half, in_channel=in_channel)
 
 
-def resnet34_dwt_tiny(block=TinyBlockDWT, num_blocks=None, num_classes=10, half=False, backbone=False, **kwargs):
+def resnet34_dwt_tiny(block=TinyBlockDWT, num_blocks=None, num_classes=10,
+                      half=False, backbone=False, in_channel=3, **kwargs):
     if num_blocks is None:
         num_blocks = [3, 4, 6, 3]
     if backbone:
-        return ResNetBackbone(block, num_blocks, half=half)
+        return ResNetBackbone(block, num_blocks, half=half, in_channel=in_channel)
     else:
-        return ResNet(block, num_blocks, num_classes=num_classes, half=half)
+        return ResNet(block, num_blocks, num_classes=num_classes, half=half, in_channel=in_channel)
 
 
-def resnet50_dwt_tiny(block=TinyBottleDWT, num_blocks=None, num_classes=10, half=False, backbone=False, **kwargs):
+def resnet50_dwt_tiny(block=TinyBottleDWT, num_blocks=None, num_classes=10,
+                      half=False, backbone=False, in_channel=3, **kwargs):
     if num_blocks is None:
         num_blocks = [3, 4, 6, 3]
     if backbone:
-        return ResNetBackbone(block, num_blocks, half=half)
+        return ResNetBackbone(block, num_blocks, half=half, in_channel=in_channel)
     else:
-        return ResNet(block, num_blocks, num_classes=num_classes, half=half)
+        return ResNet(block, num_blocks, num_classes=num_classes, half=half, in_channel=in_channel)
 
 
-def resnet18_dwt_tiny_half(block=TinyBlockDWT, num_blocks=None, num_classes=10, half=True, backbone=False, **kwargs):
+def resnet18_dwt_tiny_half(block=TinyBlockDWT, num_blocks=None, num_classes=10,
+                           half=False, backbone=False, in_channel=3, **kwargs):
     if num_blocks is None:
         num_blocks = [2, 2, 2, 2]
     if backbone:
-        return ResNetBackbone(block, num_blocks, half=half)
+        return ResNetBackbone(block, num_blocks, half=half, in_channel=in_channel)
     else:
-        return ResNet(block, num_blocks, num_classes=num_classes, half=half)
+        return ResNet(block, num_blocks, num_classes=num_classes, half=half, in_channel=in_channel)
 
 
-def resnet34_dwt_tiny_half(block=TinyBlockDWT, num_blocks=None, num_classes=10, half=True, backbone=False, **kwargs):
+def resnet34_dwt_tiny_half(block=TinyBlockDWT, num_blocks=None, num_classes=10,
+                           half=False, backbone=False, in_channel=3, **kwargs):
     if num_blocks is None:
         num_blocks = [3, 4, 6, 3]
     if backbone:
-        return ResNetBackbone(block, num_blocks, half=half)
+        return ResNetBackbone(block, num_blocks, half=half, in_channel=in_channel)
     else:
-        return ResNet(block, num_blocks, num_classes=num_classes, half=half)
+        return ResNet(block, num_blocks, num_classes=num_classes, half=half, in_channel=in_channel)
 
 
-def resnet50_dwt_tiny_half(block=TinyBottleDWT, num_blocks=None, num_classes=10, half=True, backbone=False, **kwargs):
+def resnet50_dwt_tiny_half(block=TinyBottleDWT, num_blocks=None, num_classes=10,
+                           half=False, backbone=False, in_channel=3, **kwargs):
     if num_blocks is None:
         num_blocks = [3, 4, 6, 3]
     if backbone:
-        return ResNetBackbone(block, num_blocks, half=half)
+        return ResNetBackbone(block, num_blocks, half=half, in_channel=in_channel)
     else:
-        return ResNet(block, num_blocks, num_classes=num_classes, half=half)
+        return ResNet(block, num_blocks, num_classes=num_classes, half=half, in_channel=in_channel)
 
 
-def resnet18_tiny_half(block=TinyBasicBlock, num_blocks=None, num_classes=10, half=True, backbone=False, **kwargs):
+def resnet18_tiny_half(block=TinyBasicBlock, num_blocks=None, num_classes=10,
+                       half=False, backbone=False, in_channel=3, **kwargs):
     if num_blocks is None:
         num_blocks = [2, 2, 2, 2]
     if backbone:
-        return ResNetBackbone(block, num_blocks, half=half)
+        return ResNetBackbone(block, num_blocks, half=half, in_channel=in_channel)
     else:
-        return ResNet(block, num_blocks, num_classes=num_classes, half=half)
+        return ResNet(block, num_blocks, num_classes=num_classes, half=half, in_channel=in_channel)
 
 
-# resnet 10 serial
-# def resnet10_tiny_half(block=TinyBasicBlock, num_blocks=None, num_classes=10, half=True, backbone=False, **kwargs):
-#     if num_blocks is None:
-#         num_blocks = [1, 1, 1, 1]
-#     if backbone:
-#         return ResNetBackbone(block, num_blocks, half=half)
-#     else:
-#         return ResNet(block, num_blocks, num_classes=num_classes, half=half)
-
-
-# def resnet10_dwt_tiny_half(block=TinyBlockDWT, num_blocks=None, num_classes=10, half=True, backbone=False, **kwargs):
-#     if num_blocks is None:
-#         num_blocks = [1, 1, 1, 1]
-#     if backbone:
-#         return ResNetBackbone(block, num_blocks, half=half)
-#     else:
-#         return ResNet(block, num_blocks, num_classes=num_classes, half=half)
-
-
-def resnet10_tiny_half(block=TinyBasicBlock, num_blocks=None, num_classes=10, half=True, backbone=False, **kwargs):
+def resnet10_tiny_half(block=TinyBasicBlock, num_blocks=None, num_classes=10,
+                       half=True, backbone=False, in_channel=3, **kwargs):
     if num_blocks is None:
         num_blocks = [1, 1, 1, 1]
     if backbone:
-        return ResBlockLR(block, num_blocks, half=True)
+        return ResBlockLR(block, num_blocks, half=half, in_channel=in_channel)
     else:
         raise NotImplemented
 
 
-def resnet10_dwt_tiny_half(block=TinyBlockDWT, num_blocks=None, num_classes=10, half=True, backbone=False, **kwargs):
+def resnet10_dwt_tiny_half(block=TinyBlockDWT, num_blocks=None, num_classes=10,
+                           half=True, backbone=False, in_channel=3, **kwargs):
     if num_blocks is None:
         num_blocks = [1, 1, 1, 1]
     if backbone:
-        return ResBlockLR(block, num_blocks, half=True)
+        return ResBlockLR(block, num_blocks, half=half, in_channel=in_channel)
     else:
         raise NotImplemented

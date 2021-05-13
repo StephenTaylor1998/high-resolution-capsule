@@ -15,9 +15,9 @@ from .resnet import resnet18_cifar, resnet34_cifar, resnet50_cifar, \
 
 from .others.capsnet_vb import capsule_vb_cifar, capsule_vb_smallnorb
 
-from .hr_caps_dwt import hr_caps_r_fpn, lr_caps_r_fpn, hr_caps_r10_fpn, hr_caps_r10_dwt_fpn
+from .hr_caps_dwt import hr_caps_r_fpn, lr_caps_r_fpn
 
 from .others import \
-    capsnet_dr_depthx1, capsnet_dr_depthx2, capsnet_dr_depthx3, capsnet_dr_r10_depth_x2, \
-    capsnet_em_depthx1, capsnet_em_depthx2, capsnet_em_depthx3, capsnet_em_r10_depth_x2, \
-    capsnet_sr_depthx1, capsnet_sr_depthx2, capsnet_sr_depthx3, capsnet_sr_r10_depth_x2
+    capsnet_dr_depthx1, capsnet_dr_depthx2, capsnet_dr_depthx3, \
+    capsnet_em_depthx1, capsnet_em_depthx2, capsnet_em_depthx3, \
+    capsnet_sr_depthx1, capsnet_sr_depthx2, capsnet_sr_depthx3

@@ -98,8 +98,8 @@ class TinyBlockDWT(nn.Module):
         self.stride = stride
         if self.stride == 2:
             self.conv1 = DWTForward()
-            self.bn1 = nn.BatchNorm2d((self.planes * 4) // 2)
-            self.conv2 = nn.Conv2d((self.planes * 4) // 2, self.planes, kernel_size=1, stride=1, bias=False)
+            self.bn1 = nn.BatchNorm2d(self.in_planes * 4)
+            self.conv2 = nn.Conv2d(self.in_planes * 4, self.planes, kernel_size=1, stride=1, bias=False)
             self.bn2 = nn.BatchNorm2d(self.planes)
         else:
             self.conv1 = nn.Conv2d(self.in_planes, self.planes // 2, kernel_size=3, stride=1, padding=1, bias=False)
@@ -242,11 +242,11 @@ class BottleneckDWT(nn.Module):
 
 
 class ResNetBackbone(nn.Module):
-    def __init__(self, block, num_blocks, half=True):
+    def __init__(self, block, num_blocks, half=True, in_channel=3):
         super(ResNetBackbone, self).__init__()
         self.in_planes = 64
         self.num_blocks = num_blocks
-        self.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1)
+        self.conv1 = nn.Conv2d(in_channel, 64, kernel_size=3, stride=1, padding=1)
         self.bn1 = nn.BatchNorm2d(64)
         self.relu = nn.ReLU()
         if half:
@@ -283,11 +283,11 @@ class ResNetBackbone(nn.Module):
 
 
 class ResBlockLR(nn.Module):
-    def __init__(self, block, num_blocks, half=True):
+    def __init__(self, block, num_blocks, half=True, in_channel=3):
         super(ResBlockLR, self).__init__()
         self.in_planes = 64
         self.num_blocks = num_blocks
-        self.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1)
+        self.conv1 = nn.Conv2d(in_channel, 64, kernel_size=3, stride=1, padding=1)
         self.bn1 = nn.BatchNorm2d(64)
         self.relu = nn.ReLU()
         if half:

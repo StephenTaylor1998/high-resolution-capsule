@@ -12,6 +12,7 @@ cifar_transform_train = transforms.Compose([
 ])
 
 cifar_transform_test = transforms.Compose([
+    # transforms.RandomRotation((-180, 180)),
     transforms.ToTensor(),
     cifar_normalize,
 ])
