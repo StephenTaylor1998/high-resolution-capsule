@@ -1,6 +1,6 @@
 import torch
 from torch import nn
-from core.layers.others.layers_deep import ConvertToCaps, Conv2DCaps, ConvCapsLayer3D, FlattenCaps, \
+from core.layers.others.layers_dp import ConvertToCaps, Conv2DCaps, ConvCapsLayer3D, FlattenCaps, \
     CapsuleLayer, CapsToScalars
 
 
