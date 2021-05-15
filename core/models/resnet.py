@@ -188,6 +188,16 @@ def resnet18_tiny_half(block=TinyBasicBlock, num_blocks=None, num_classes=10,
         return ResNet(block, num_blocks, num_classes=num_classes, half=half, in_channel=in_channel)
 
 
+def resnet18_tiny(block=TinyBasicBlock, num_blocks=None, num_classes=10,
+                  half=False, backbone=False, in_channel=3, **kwargs):
+    if num_blocks is None:
+        num_blocks = [2, 2, 2, 2]
+    if backbone:
+        return ResNetBackbone(block, num_blocks, half=half, in_channel=in_channel)
+    else:
+        return ResNet(block, num_blocks, num_classes=num_classes, half=half, in_channel=in_channel)
+
+
 def resnet10_tiny_half(block=TinyBasicBlock, num_blocks=None, num_classes=10,
                        half=True, backbone=False, in_channel=3, **kwargs):
     if num_blocks is None:
