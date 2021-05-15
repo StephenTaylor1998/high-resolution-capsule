@@ -1,5 +1,7 @@
 import torch
 import torch.nn as nn
+
+from core.layers.gate import GateModuleA
 from core.layers.transforms.dwt import DWTForward
 
 
@@ -319,5 +321,49 @@ class ResBlockLR(nn.Module):
         out = self.layer1(out)
         out = self.layer2(out)
         out = self.layer3(out)
+        out = self.layer4(out)
+        return out
+
+
+class ResNetGumbel(nn.Module):
+    def __init__(self, block, num_blocks, half=True, in_channel=3):
+        super(ResNetGumbel, self).__init__()
+        self.in_planes = 64
+        self.num_blocks = num_blocks
+        self.conv1 = nn.Conv2d(in_channel, 64, kernel_size=3, stride=1, padding=1)
+        self.bn1 = nn.BatchNorm2d(64)
+        self.relu = nn.ReLU()
+        if half:
+            self.layer1 = self._make_layer(block, 32, self.num_blocks[0], stride=2)
+            self.layer2 = self._make_layer(block, 64, self.num_blocks[1], stride=2)
+            self.layer3 = self._make_layer(block, 128, self.num_blocks[2], stride=1)
+            self.ggate3 = GateModuleA(128)
+            self.layer4 = self._make_layer(block, 256, self.num_blocks[3], stride=1)
+        else:
+            self.layer1 = self._make_layer(block, 64, self.num_blocks[0], stride=2)
+            self.layer2 = self._make_layer(block, 128, self.num_blocks[1], stride=2)
+            self.layer3 = self._make_layer(block, 256, self.num_blocks[2], stride=1)
+            self.ggate3 = GateModuleA(256)
+            self.layer4 = self._make_layer(block, 256, self.num_blocks[3], stride=1)
+
+    def _make_layer(self, block, planes, num_blocks, stride):
+        strides = [stride] + [1] * (num_blocks - 1)
+        layer_list = []
+        for stride in strides:
+            layer_list.append(block(self.in_planes, planes, stride))
+            self.in_planes = planes * block.expansion
+        return nn.Sequential(*layer_list)
+
+    def compute_shape(self, shape, batch_size=1, data_type=torch.float32):
+        inputs = torch.ones((batch_size, *shape), dtype=data_type)
+        out = self.forward(inputs)
+        return out.shape[1:]
+
+    def forward(self, inputs):
+        out = self.relu(self.bn1(self.conv1(inputs)))
+        out = self.layer1(out)
+        out = self.layer2(out)
+        out = self.layer3(out)
+        out = self.ggate3(out)
         out = self.layer4(out)
         return out
