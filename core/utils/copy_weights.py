@@ -9,7 +9,7 @@ def copy_weights(arg, epoch):
     lr = arg.lr
     ds = arg.data_format.strip()
     fpn = arg.routing_name_list if arg.routing_name_list is not None else ''
-    backbone = arg.backbone if arg.backbone is not None else ''
+    backbone = f"_{arg.backbone}" if arg.backbone is not None else ''
 
     # folder_name = '%s_epoch%d_bs%d_lr%.1e_%s' % \
     #               (model_name, epochs, batch_size, learning_rate, datasets)
