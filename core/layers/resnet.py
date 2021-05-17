@@ -40,9 +40,9 @@ class TinyBasicBlock(nn.Module):
         self.in_planes = in_planes
         self.planes = planes
         self.stride = stride
-        self.conv1 = nn.Conv2d(self.in_planes, planes//4, kernel_size=3, stride=stride, padding=1, bias=False)
-        self.bn1 = nn.BatchNorm2d(planes//4)
-        self.conv2 = nn.Conv2d(planes//4, planes, kernel_size=3, stride=1, padding=1, bias=False)
+        self.conv1 = nn.Conv2d(self.in_planes, planes // 4, kernel_size=3, stride=stride, padding=1, bias=False)
+        self.bn1 = nn.BatchNorm2d(planes // 4)
+        self.conv2 = nn.Conv2d(planes // 4, planes, kernel_size=3, stride=1, padding=1, bias=False)
         self.bn2 = nn.BatchNorm2d(self.planes)
         self.relu = nn.ReLU()
         self.shortcut = nn.Sequential()
@@ -366,4 +366,38 @@ class ResNetGumbel(nn.Module):
         out = self.layer3(out)
         out = self.ggate3(out)
         out = self.layer4(out)
+        return out
+
+
+class TinyBlock_x_7(nn.Module):
+    def __init__(self, block, in_channel=3, out_channel=256):
+        super(TinyBlock_x_7, self).__init__()
+        self.in_planes = 32
+
+        self.conv1 = nn.Conv2d(in_channel, 32, kernel_size=3, stride=2, padding=1)
+        self.bn1 = nn.BatchNorm2d(32)
+        self.relu = nn.ReLU()
+
+        self.layer1 = self._make_layer(block, 256, 1, stride=2)
+        # self.layer2 = self._make_layer(block, 64, 1, stride=2)
+        # self.layer3 = self._make_layer(block, out_channel, 1, stride=2)
+
+    def _make_layer(self, block, planes, num_blocks, stride):
+        strides = [stride] + [1] * (num_blocks - 1)
+        layer_list = []
+        for stride in strides:
+            layer_list.append(block(self.in_planes, planes, stride))
+            self.in_planes = planes * block.expansion
+        return nn.Sequential(*layer_list)
+
+    def compute_shape(self, shape, batch_size=1, data_type=torch.float32):
+        inputs = torch.ones((batch_size, *shape), dtype=data_type)
+        out = self.forward(inputs)
+        return out.shape[1:]
+
+    def forward(self, inputs):
+        out = self.relu(self.bn1(self.conv1(inputs)))
+        out = self.layer1(out)
+        # out = self.layer2(out)
+        # out = self.layer3(out)
         return out
