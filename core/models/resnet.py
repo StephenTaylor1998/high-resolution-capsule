@@ -10,7 +10,7 @@ from core.layers.resnet import \
     TinyBlockDWT, \
     TinyBottleDWT, \
     ResNetBackbone, \
-    ResBlockLR
+    ResBlockLR, ResNetGumbel, TinyBlock_x_7
 
 
 class ResNet(nn.Module):
@@ -46,9 +46,7 @@ class ResNet(nn.Module):
     def forward(self, inputs):
         out = self.relu(self.bn1(self.conv1(inputs)))
         out = self.layer1(out)
-
         out = self.layer2(out)
-
         out = self.layer3(out)
         out = self.layer4(out)
         out = self.pool(out)
@@ -198,6 +196,17 @@ def resnet18_tiny(block=TinyBasicBlock, num_blocks=None, num_classes=10,
         return ResNet(block, num_blocks, num_classes=num_classes, half=half, in_channel=in_channel)
 
 
+def resnet18_dwt_tiny_half_gumbel(block=TinyBlockDWT, num_blocks=None, num_classes=10,
+                                  half=True, backbone=False, in_channel=3, **kwargs):
+    if num_blocks is None:
+        num_blocks = [2, 2, 2, 2]
+    if backbone:
+        return ResNetGumbel(block, num_blocks, half=half, in_channel=in_channel)
+    else:
+        raise NotImplemented
+        # return ResNetGumbel(block, num_blocks, num_classes=num_classes, half=half, in_channel=in_channel)
+
+
 def resnet10_tiny_half(block=TinyBasicBlock, num_blocks=None, num_classes=10,
                        half=True, backbone=False, in_channel=3, **kwargs):
     if num_blocks is None:
@@ -214,5 +223,12 @@ def resnet10_dwt_tiny_half(block=TinyBlockDWT, num_blocks=None, num_classes=10,
         num_blocks = [1, 1, 1, 1]
     if backbone:
         return ResBlockLR(block, num_blocks, half=half, in_channel=in_channel)
+    else:
+        raise NotImplemented
+
+
+def res_block_tiny(block=TinyBasicBlock, in_channel=3, out_channel=256, backbone=True, **kwargs):
+    if backbone:
+        return TinyBlock_x_7(block, in_channel, out_channel)
     else:
         raise NotImplemented

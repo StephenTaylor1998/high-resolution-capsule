@@ -98,7 +98,7 @@ def capsule_vb_tiny_smallnorb(num_classes=5, args=None, **kwargs):
 #     model = CapsuleNet([64, 8, 16, 16, 10], 10, 3, pose_dim=4, routing_iter=3).cuda()
 #     out = model(inp)
 #     print(out.shape)
-#     # model = HRCapsTiny((3, 32, 32), 10, ['FPN', 'FPN', 'FPN'], 128)
+#     # model = LRCaps((3, 32, 32), 10, ['FPN', 'FPN', 'FPN'], 128)
 #     # print(out.shape)
 #     # print(out)
 #

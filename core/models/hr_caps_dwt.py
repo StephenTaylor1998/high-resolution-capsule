@@ -26,10 +26,10 @@ class HRCaps(nn.Module):
         return classes
 
 
-class HRCapsTiny(nn.Module):
+class LRCaps(nn.Module):
     def __init__(self, in_shape, num_classes=10, routing_name_list: Union[list, tuple] = None,
                  backbone=models.resnet10_tiny_half):
-        super(HRCapsTiny, self).__init__()
+        super(LRCaps, self).__init__()
         print("inshape", in_shape)
         self.backbone = backbone(backbone=True, in_channel=in_shape[0])
         channels = self.backbone.compute_shape(in_shape)[0]
@@ -56,4 +56,4 @@ def lr_caps_r_fpn(num_classes=10, args=None, **kwargs):
     in_shape = (3, 32, 32) if args.in_shape is None else args.in_shape
     routing_name_list = ['Tiny_FPN'] if args.routing_name_list is None else args.routing_name_list
     backbone = models.__dict__[args.backbone]
-    return HRCapsTiny(in_shape, num_classes, routing_name_list, backbone)
+    return LRCaps(in_shape, num_classes, routing_name_list, backbone)
