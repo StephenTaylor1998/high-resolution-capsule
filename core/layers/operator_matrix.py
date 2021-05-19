@@ -72,15 +72,19 @@ class CapsFPNTiny(nn.Module):
                  matrix_shape: Union[list, tuple] = None):
         super(CapsFPNTiny, self).__init__()
         rate_list = [2, 2, 2, 1] if rate_list is None else rate_list
-        self.matrix_shape = (4, 4) if matrix_shape is None else matrix_shape
+        matrix_shape = (4, 4) if matrix_shape is None else matrix_shape
+        self.num_capsule = 32 if num_capsule is None else num_capsule
         num_capsule = num_capsule // rate_list[0]
-        self.condense1 = CondenseTiny(num_capsule, rate=rate_list[0], matrix_shape=self.matrix_shape)
+        self.condense1 = CondenseTiny(num_capsule, rate=rate_list[0], matrix_shape=matrix_shape)
         num_capsule = num_capsule // rate_list[1]
-        self.condense2 = CondenseTiny(num_capsule, rate=rate_list[1], matrix_shape=self.matrix_shape)
+        self.condense2 = CondenseTiny(num_capsule, rate=rate_list[1], matrix_shape=matrix_shape)
         num_capsule = num_capsule // rate_list[2]
-        self.condense3 = CondenseTiny(num_capsule, rate=rate_list[2], matrix_shape=self.matrix_shape)
+        self.condense3 = CondenseTiny(num_capsule, rate=rate_list[2], matrix_shape=matrix_shape)
         num_capsule = num_capsule // rate_list[3]
-        self.condense4 = CondenseTiny(num_capsule, rate=rate_list[3], matrix_shape=self.matrix_shape)
+        self.condense4 = CondenseTiny(num_capsule, rate=rate_list[3], matrix_shape=matrix_shape)
+        self.squeeze = nn.Linear(self.num_capsule, self.num_capsule // 2)
+        self.activate = nn.Tanh()
+        self.excitation = nn.Linear(self.num_capsule // 2, self.num_capsule)
 
     def forward(self, x):
         l1 = self.condense1(x)
@@ -88,6 +92,9 @@ class CapsFPNTiny(nn.Module):
         l3 = self.condense3(l2)
         l4 = self.condense4(l3)
         feature_pyramid = torch.cat([l1, l2, l3, l4], dim=-3)
+        se = self.excitation(self.activate(self.squeeze(torch.mean(feature_pyramid, [-1, -2]))))
+        se = torch.reshape(se, (*se.shape, 1, 1))
+        feature_pyramid = feature_pyramid * se
         return feature_pyramid
 
 
@@ -101,6 +108,10 @@ class CapsFPN(nn.Module):
         self.condense2 = Condense(num_caps[1], self.matrix_shape)
         self.condense3 = Condense(num_caps[2], self.matrix_shape)
         self.condense4 = Condense(num_caps[3], self.matrix_shape)
+        num_caps = sum(num_caps)
+        self.squeeze = nn.Linear(num_caps, num_caps//2)
+        self.activate = nn.Tanh()
+        self.excitation = nn.Linear(num_caps//2, num_caps)
 
     def forward(self, x):
         l1 = self.condense1(x)
@@ -108,7 +119,54 @@ class CapsFPN(nn.Module):
         l3 = self.condense3(l2)
         l4 = self.condense4(l3)
         feature_pyramid = torch.cat([l1, l2, l3, l4], dim=-3)
+        se = self.excitation(self.activate(self.squeeze(torch.mean(feature_pyramid, [-1, -2]))))
+        se = torch.reshape(se, (*se.shape, 1, 1))
+        feature_pyramid = feature_pyramid * se
         return feature_pyramid
+
+
+# class CapsFPNTiny(nn.Module):
+#     def __init__(self, num_capsule: int = None, rate_list: Union[list, tuple] = None,
+#                  matrix_shape: Union[list, tuple] = None):
+#         super(CapsFPNTiny, self).__init__()
+#         rate_list = [2, 2, 2, 1] if rate_list is None else rate_list
+#         self.matrix_shape = (4, 4) if matrix_shape is None else matrix_shape
+#         num_capsule = num_capsule // rate_list[0]
+#         self.condense1 = CondenseTiny(num_capsule, rate=rate_list[0], matrix_shape=self.matrix_shape)
+#         num_capsule = num_capsule // rate_list[1]
+#         self.condense2 = CondenseTiny(num_capsule, rate=rate_list[1], matrix_shape=self.matrix_shape)
+#         num_capsule = num_capsule // rate_list[2]
+#         self.condense3 = CondenseTiny(num_capsule, rate=rate_list[2], matrix_shape=self.matrix_shape)
+#         num_capsule = num_capsule // rate_list[3]
+#         self.condense4 = CondenseTiny(num_capsule, rate=rate_list[3], matrix_shape=self.matrix_shape)
+#
+#     def forward(self, x):
+#         l1 = self.condense1(x)
+#         l2 = self.condense2(l1)
+#         l3 = self.condense3(l2)
+#         l4 = self.condense4(l3)
+#         feature_pyramid = torch.cat([l1, l2, l3, l4], dim=-3)
+#         return feature_pyramid
+#
+#
+# class CapsFPN(nn.Module):
+#     def __init__(self, num_caps: Union[list, tuple] = None,
+#                  matrix_shape: Union[list, tuple] = None,):
+#         super(CapsFPN, self).__init__()
+#         num_caps = (16, 8, 4, 4) if num_caps is None else num_caps
+#         self.matrix_shape = (4, 4) if matrix_shape is None else matrix_shape
+#         self.condense1 = Condense(num_caps[0], self.matrix_shape)
+#         self.condense2 = Condense(num_caps[1], self.matrix_shape)
+#         self.condense3 = Condense(num_caps[2], self.matrix_shape)
+#         self.condense4 = Condense(num_caps[3], self.matrix_shape)
+#
+#     def forward(self, x):
+#         l1 = self.condense1(x)
+#         l2 = self.condense2(l1)
+#         l3 = self.condense3(l2)
+#         l4 = self.condense4(l3)
+#         feature_pyramid = torch.cat([l1, l2, l3, l4], dim=-3)
+#         return feature_pyramid
 
 
 class PrimaryCaps(nn.Module):
