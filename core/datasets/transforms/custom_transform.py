@@ -17,7 +17,7 @@ ImageNetNormalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
 # iamgenet examples
 ImageNetTrainTransform = transforms.Compose([
     transforms.RandomResizedCrop(224),
-    transforms.RandomHorizontalFlip(),
+    # transforms.RandomHorizontalFlip(),
     transforms.ToTensor(),
     ImageNetNormalize,
 ])
@@ -40,7 +40,7 @@ ImageNetTestTransform = transforms.Compose([
 # iamgenet examples
 HRImageNetTrainTransform = transforms.Compose([
     transforms.RandomResizedCrop(512),
-    transforms.RandomHorizontalFlip(),
+    # transforms.RandomHorizontalFlip(),
     transforms.ToTensor(),
     ImageNetNormalize,
 ])

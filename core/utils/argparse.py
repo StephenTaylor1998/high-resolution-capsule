@@ -15,7 +15,7 @@ def arg_parse():
     parser.add_argument('-d', '--data_format', metavar='DATA_FORMAT', default='imagefolder',
                         choices=['image_folder', 'imagenet', 'cifar10', 'cifar100', 'mnist',
                                  'fashion_mnist', 'small_norb', 'image_folder_high_resolution',
-                                 'small_norb_view_point'],
+                                 'small_norb_view_point', 'image_folder_limit_data'],
                         help='data format: (default: imagefolder)')
     parser.add_argument('-a', '--arch', metavar='ARCH', default='resnet18',
                         choices=model_names,

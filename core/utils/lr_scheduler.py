@@ -23,6 +23,21 @@ def cifar(optimizer, epoch, args):
         param_group['lr'] = lr
 
 
+def small_norb(optimizer, epoch, args):
+    if epoch < 10:
+        lr = args.lr * (epoch/10)
+    elif epoch < 40:
+        lr = args.lr
+    elif epoch < 80:
+        lr = args.lr * 0.1
+    elif epoch < 100:
+        lr = args.lr * 0.01
+    else:
+        lr = args.lr * 0.001
+    for param_group in optimizer.param_groups:
+        param_group['lr'] = lr
+
+
 def mnist(optimizer, epoch, args):
     if epoch < 30:
         lr = args.lr
@@ -43,6 +58,7 @@ def mnist(optimizer, epoch, args):
 _scheduler_dict = {"imagenet": imagenet,
                    "cifar": cifar,
                    "mnist": mnist,
+                   "small_norb": small_norb,
                    }
 
 
