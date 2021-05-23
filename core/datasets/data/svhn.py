@@ -14,7 +14,7 @@ cifar_transform_train = transforms.Compose([
 ])
 
 cifar_transform_test = transforms.Compose([
-    transforms.RandomRotation((45, 45)),
+    # transforms.RandomRotation((45, 45)),
     transforms.ToTensor(),
     cifar_normalize,
 ])
@@ -44,5 +44,5 @@ def test_dataset(data_dir, transform=cifar_transform_test, **kwargs):
 
 '''
 python train_imagenet.py -d svhn -a hr_caps_r_fpn -b 512 -j 2 -c 10 --epoch 250 --dist-url 'tcp://127.0.0.1:8889' --dist-backend 'nccl' --multiprocessing-distributed --world-size 1 --rank 0 ./data/dataset/ --lr-scheduler cifar --backbone resnet10_dwt_tiny_half --routing-name-list FPN FPN --in-shape 1 32 32
-python train_imagenet.py -d svhn -a hr_caps_r_fpn -b 512 -j 2 -c 10 --epoch 250 ./data/dataset/ --lr-scheduler cifar --backbone resnet10_dwt_tiny_half --routing-name-list FPN FPN --in-shape 1 32 32
+python train_imagenet.py -d svhn -a hr_caps_r_fpn -b 512 -j 2 -c 10 --epoch 250 ./data/dataset/svhn --lr-scheduler cifar --backbone resnet10_dwt_tiny_half --routing-name-list FPN FPN --in-shape 1 32 32
 '''

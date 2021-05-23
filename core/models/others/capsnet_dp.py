@@ -5,9 +5,9 @@ from core.layers.others.layers_dp import ConvertToCaps, Conv2DCaps, ConvCapsLaye
 
 
 class Model32x32(nn.Module):
-    def __init__(self):
+    def __init__(self, in_shape):
         super().__init__()
-        self.conv2d = nn.Conv2d(in_channels=3, out_channels=128,
+        self.conv2d = nn.Conv2d(in_channels=in_shape[0], out_channels=128,
                                 kernel_size=3, stride=1, padding=1)
         self.batchNorm = torch.nn.BatchNorm2d(num_features=128, eps=1e-08, momentum=0.99)
         self.toCaps = ConvertToCaps()
@@ -90,13 +90,14 @@ class Model32x32(nn.Module):
         return x
 
 
-def capsnet_dp_32x32(**kwargs):
-    return Model32x32()
+def capsnet_dp_32x32(args=None, **kwargs):
+    in_shape = (3, 32, 32) if args.in_shape is None else args.in_shape
+    return Model32x32(in_shape)
 
 
-if __name__ == '__main__':
-    model = capsnet_dp_32x32().cuda()
-
-    inp = torch.ones((1, 3, 32, 32), dtype=torch.float32).cuda()
-    out = model(inp)
-    print(out.shape)
+# if __name__ == '__main__':
+#     model = capsnet_dp_32x32().cuda()
+#
+#     inp = torch.ones((1, 3, 32, 32), dtype=torch.float32).cuda()
+#     out = model(inp)
+#     print(out.shape)

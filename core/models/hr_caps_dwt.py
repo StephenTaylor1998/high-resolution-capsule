@@ -32,7 +32,7 @@ class LRCaps(nn.Module):
         super(LRCaps, self).__init__()
         self.backbone = backbone(backbone=True, in_channel=in_shape[0])
         channels = self.backbone.compute_shape(in_shape)[0]
-        self.primary_caps = PrimaryCaps(channels, channels, 1, 3, num_capsule=channels // 16, capsule_shape=(4, 4))
+        self.primary_caps = PrimaryCaps(channels, channels, 1, 1, num_capsule=channels // 16, capsule_shape=(4, 4))
         self.routing = RoutingMatrix(channels // 16, num_classes, routing_name_list)
         self.length = LengthMatrix()
 
