@@ -72,16 +72,16 @@ class CapsFPNTiny(nn.Module):
                  matrix_shape: Union[list, tuple] = None):
         super(CapsFPNTiny, self).__init__()
         rate_list = [2, 2, 2, 1] if rate_list is None else rate_list
-        matrix_shape = (4, 4) if matrix_shape is None else matrix_shape
+        self.matrix_shape = (4, 4) if matrix_shape is None else matrix_shape
         self.num_capsule = 32 if num_capsule is None else num_capsule
         num_capsule = num_capsule // rate_list[0]
-        self.condense1 = CondenseTiny(num_capsule, rate=rate_list[0], matrix_shape=matrix_shape)
+        self.condense1 = CondenseTiny(num_capsule, rate=rate_list[0], matrix_shape=self.matrix_shape)
         num_capsule = num_capsule // rate_list[1]
-        self.condense2 = CondenseTiny(num_capsule, rate=rate_list[1], matrix_shape=matrix_shape)
+        self.condense2 = CondenseTiny(num_capsule, rate=rate_list[1], matrix_shape=self.matrix_shape)
         num_capsule = num_capsule // rate_list[2]
-        self.condense3 = CondenseTiny(num_capsule, rate=rate_list[2], matrix_shape=matrix_shape)
+        self.condense3 = CondenseTiny(num_capsule, rate=rate_list[2], matrix_shape=self.matrix_shape)
         num_capsule = num_capsule // rate_list[3]
-        self.condense4 = CondenseTiny(num_capsule, rate=rate_list[3], matrix_shape=matrix_shape)
+        self.condense4 = CondenseTiny(num_capsule, rate=rate_list[3], matrix_shape=self.matrix_shape)
         self.squeeze = nn.Linear(self.num_capsule, self.num_capsule // 2)
         self.activate = nn.Tanh()
         self.excitation = nn.Linear(self.num_capsule // 2, self.num_capsule)

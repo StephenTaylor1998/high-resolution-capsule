@@ -6,10 +6,11 @@ from get_data_from_log_file import get_data_from_log_file
 
 
 if __name__ == '__main__':
-    model_name = 'densenet121-train90-lr0.1-batch768'
+    model_name = 'log-em-smallvp.txt'
+    # model_name = 'restnet18-train90-lr0.1'
     # model_name = 'restnet18-train90-lr0.1'
     check_dir()
-    get_data_from_log_file(log_file='%s.txt' % model_name)
+    get_data_from_log_file(source_root='../logs/log/', log_file='%s' % model_name)
     draw_all()
     copy_resources_to_processed(model_name=model_name, file_name='modified', replace=True)
     copy_resources_to_processed(model_name=model_name, file_name='plt', replace=True)

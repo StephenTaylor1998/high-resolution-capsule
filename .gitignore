@@ -1,9 +1,7 @@
 # Project exclude paths
 .idea
 /venv/
-/zdemo/
 /data/weights/
 /data/dataset/
-/data/weights/resnet50_tiny_c1_epoch90_bs128_lr1.0e-01_data/
-demo.py
 /demo/
+/data/logs/log/

@@ -30,10 +30,9 @@ class LRCaps(nn.Module):
     def __init__(self, in_shape, num_classes=10, routing_name_list: Union[list, tuple] = None,
                  backbone=models.resnet10_tiny_half):
         super(LRCaps, self).__init__()
-        print("inshape", in_shape)
         self.backbone = backbone(backbone=True, in_channel=in_shape[0])
         channels = self.backbone.compute_shape(in_shape)[0]
-        self.primary_caps = PrimaryCaps(channels, channels, 2, 1, num_capsule=channels // 16, capsule_shape=(4, 4))
+        self.primary_caps = PrimaryCaps(channels, channels, 1, 1, num_capsule=channels // 16, capsule_shape=(4, 4))
         self.routing = RoutingMatrix(channels // 16, num_classes, routing_name_list)
         self.length = LengthMatrix()
 

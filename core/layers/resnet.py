@@ -369,8 +369,42 @@ class ResNetGumbel(nn.Module):
         return out
 
 
+# class TinyBlock_x_7(nn.Module):
+#     def __init__(self, block, in_channel=3, out_channel=256):
+#         super(TinyBlock_x_7, self).__init__()
+#         self.in_planes = 32
+#
+#         self.conv1 = nn.Conv2d(in_channel, 32, kernel_size=3, stride=2, padding=1)
+#         self.bn1 = nn.BatchNorm2d(32)
+#         self.relu = nn.ReLU()
+#
+#         self.layer1 = self._make_layer(block, out_channel, 1, stride=2)
+#         # self.layer2 = self._make_layer(block, 64, 1, stride=2)
+#         # self.layer3 = self._make_layer(block, out_channel, 1, stride=2)
+#
+#     def _make_layer(self, block, planes, num_blocks, stride):
+#         strides = [stride] + [1] * (num_blocks - 1)
+#         layer_list = []
+#         for stride in strides:
+#             layer_list.append(block(self.in_planes, planes, stride))
+#             self.in_planes = planes * block.expansion
+#         return nn.Sequential(*layer_list)
+#
+#     def compute_shape(self, shape, batch_size=1, data_type=torch.float32):
+#         inputs = torch.ones((batch_size, *shape), dtype=data_type)
+#         out = self.forward(inputs)
+#         return out.shape[1:]
+#
+#     def forward(self, inputs):
+#         out = self.relu(self.bn1(self.conv1(inputs)))
+#         out = self.layer1(out)
+#         # out = self.layer2(out)
+#         # out = self.layer3(out)
+#         return out
+
+
 class TinyBlock_x_7(nn.Module):
-    def __init__(self, block, in_channel=3, out_channel=256):
+    def __init__(self, block, in_channel=3, out_channel=128):
         super(TinyBlock_x_7, self).__init__()
         self.in_planes = 32
 
@@ -378,9 +412,9 @@ class TinyBlock_x_7(nn.Module):
         self.bn1 = nn.BatchNorm2d(32)
         self.relu = nn.ReLU()
 
-        self.layer1 = self._make_layer(block, 256, 1, stride=2)
-        # self.layer2 = self._make_layer(block, 64, 1, stride=2)
-        # self.layer3 = self._make_layer(block, out_channel, 1, stride=2)
+        self.layer1 = self._make_layer(block, 32, 1, stride=1)
+        self.layer2 = self._make_layer(block, 48, 1, stride=2)
+        self.layer3 = self._make_layer(block, out_channel, 1, stride=1)
 
     def _make_layer(self, block, planes, num_blocks, stride):
         strides = [stride] + [1] * (num_blocks - 1)
@@ -398,6 +432,6 @@ class TinyBlock_x_7(nn.Module):
     def forward(self, inputs):
         out = self.relu(self.bn1(self.conv1(inputs)))
         out = self.layer1(out)
-        # out = self.layer2(out)
-        # out = self.layer3(out)
+        out = self.layer2(out)
+        out = self.layer3(out)
         return out

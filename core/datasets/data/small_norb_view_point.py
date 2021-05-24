@@ -380,15 +380,15 @@ class smallNORBViewPoint(data.Dataset):
 
 
 def train_dataset(data_dir, transform=SmallNorbVPTrainTransform, **kwargs):
-    return smallNORBViewPoint(data_dir, exp='azimuth', train=True, familiar=False, download=True,
+    return smallNORBViewPoint(data_dir, exp='elevation', train=True, familiar=False, download=True,
                               transform=transform,)
 
 
 def val_dataset(data_dir, transform=SmallNorbVPValTransform, **kwargs):
-    return smallNORBViewPoint(data_dir, exp='azimuth', train=False, familiar=False, download=False,
+    return smallNORBViewPoint(data_dir, exp='elevation', train=False, familiar=False, download=False,
                               transform=transform)
 
 
 def test_dataset(data_dir, transform=SmallNorbVPTestTransform, **kwargs):
-    return smallNORBViewPoint(data_dir, exp='azimuth', familiar=False, train=False, download=True,
+    return smallNORBViewPoint(data_dir, exp='elevation', familiar=False, train=False, download=True,
                               transform=transform)

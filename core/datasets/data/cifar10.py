@@ -1,8 +1,8 @@
 from torchvision import datasets
 from torchvision.transforms import transforms
 
-cifar_normalize = transforms.Normalize(mean=[0.4914, 0.4822, 0.4465],
-                                       std=[0.2023, 0.1994, 0.2010])
+cifar_normalize = transforms.Normalize(mean=[0.49139968, 0.48215841, 0.44653091],
+                                       std=[0.24703223, 0.24348513, 0.26158784])
 
 cifar_transform_train = transforms.Compose([
     transforms.RandomCrop(32, padding=4),
@@ -12,7 +12,7 @@ cifar_transform_train = transforms.Compose([
 ])
 
 cifar_transform_test = transforms.Compose([
-    # transforms.RandomRotation((-180, 180)),
+    # transforms.RandomRotation((45, 45)),
     transforms.ToTensor(),
     cifar_normalize,
 ])
