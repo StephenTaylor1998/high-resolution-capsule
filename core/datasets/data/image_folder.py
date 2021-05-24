@@ -3,8 +3,8 @@ from torchvision import datasets
 from torchvision.transforms import transforms
 from core.datasets.transforms.custom_transform import *
 
-normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                 std=[0.229, 0.224, 0.225])
+normalize = transforms.Normalize(mean=[0.1307],
+                                 std=[0.3081])
 
 
 def classify_dataset(data_dir, transform, not_strict=False):

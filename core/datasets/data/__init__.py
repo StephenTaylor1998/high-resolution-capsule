@@ -6,4 +6,5 @@ from . import imagenet
 from . import mnist
 from . import small_norb
 from . import small_norb_view_point
-from . import svhn
+from . import svhn_20k
+from . import svhn_10k

@@ -95,8 +95,8 @@ def main_worker(gpu, ngpus_per_node, args):
     # train data loader is here, distribute is support #
     if args.distributed:
         train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset)
-        # val_sampler = torch.utils.data.distributed.DistributedSampler(val_dataset)
-        val_sampler = None
+        val_sampler = torch.utils.data.distributed.DistributedSampler(val_dataset)
+        # val_sampler = None
     else:
         train_sampler = None
         val_sampler = None
@@ -133,7 +133,7 @@ def main_worker(gpu, ngpus_per_node, args):
     for epoch in range(args.start_epoch, args.epochs):
         if args.distributed:
             train_sampler.set_epoch(epoch)
-            # val_sampler.set_epoch(epoch)
+            val_sampler.set_epoch(epoch)
         # adjust_learning_rate(optimizer, epoch, args)
         adjust_learning_rate(optimizer, epoch, args)
 

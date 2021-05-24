@@ -7,14 +7,18 @@ import torch.nn.parallel
 import torch.optim
 import torch.utils.data
 import torch.utils.data.distributed
-
-# from core.datasets.classify_dataset import classify_dataset_sample
-from core.engine.base import validate, adjust_learning_rate, train, save_checkpoint
+from core import models
+from core.datasets.data_zoo import get_data_by_name
+from core.utils.lr_scheduler import get_scheduler_by_name
+from core.utils.copy_weights import copy_weights
+from core.utils.resume import resume_from_checkpoint
+from core.engine.base import validate, train, save_checkpoint
+from torch.nn import functional
 
 best_acc1 = 0
 
 
-def main_worker(gpu, ngpus_per_node, model, train_dataset, val_dataset, args):
+def main_worker(gpu, ngpus_per_node, args):
     global best_acc1
     args.gpu = gpu
 
@@ -28,6 +32,23 @@ def main_worker(gpu, ngpus_per_node, model, train_dataset, val_dataset, args):
             args.rank = args.rank * ngpus_per_node + gpu
         dist.init_process_group(backend=args.dist_backend, init_method=args.dist_url,
                                 world_size=args.world_size, rank=args.rank)
+    # create model
+    if args.pretrained:
+        print("=> using pre-trained model '{}'".format(args.arch))
+        try:
+            model = models.__dict__[args.arch](pretrained=True, num_classes=args.classes, args=args)
+        except TypeError:
+            print(F"Parameter Type Error, fixing...")
+            model = models.__dict__[args.arch](pretrained=True, num_classes=args.classes)
+
+    else:
+        print("=> creating model '{}'".format(args.arch))
+        # model = models.__dict__[args.arch](num_classes=args.classes, args=args)
+        try:
+            model = models.__dict__[args.arch](num_classes=args.classes, args=args)
+        except TypeError:
+            print(F"Parameter Type Error, fixing...")
+            model = models.__dict__[args.arch](num_classes=args.classes)
 
     if not torch.cuda.is_available():
         print('using CPU, this will be slow')
@@ -53,56 +74,69 @@ def main_worker(gpu, ngpus_per_node, model, train_dataset, val_dataset, args):
 
     # define loss function (criterion) and optimizer
     criterion = nn.CrossEntropyLoss().cuda(args.gpu)
+    # criterion = nn.SoftMarginLoss().cuda(args.gpu)
+    # criterion = nn.MultiLabelSoftMarginLoss().cuda(args.gpu)
 
-    optimizer = torch.optim.SGD(model.parameters(), args.lr,
-                                momentum=args.momentum,
-                                weight_decay=args.weight_decay)
+    adjust_learning_rate = get_scheduler_by_name(args.lr_scheduler)
+
+    # optimizer = torch.optim.SGD(model.parameters(), args.lr,
+    #                             momentum=args.momentum,
+    #                             weight_decay=args.weight_decay)
+    optimizer = torch.optim.Adam(model.parameters(), args.lr,
+                                 weight_decay=args.weight_decay)
 
     # optionally resume from a checkpoint
     if args.resume:
-        if os.path.isfile(args.resume):
-            print("=> loading checkpoint '{}'".format(args.resume))
-            if args.gpu is None:
-                checkpoint = torch.load(args.resume)
-            else:
-                # Map model to be loaded to specified single gpu.
-                loc = 'cuda:{}'.format(args.gpu)
-                checkpoint = torch.load(args.resume, map_location=loc)
-            args.start_epoch = checkpoint['epoch']
-            best_acc1 = checkpoint['best_acc1']
-            if args.gpu is not None:
-                # best_acc1 may be from a checkpoint from a different GPU
-                best_acc1 = best_acc1.to(args.gpu)
-            model.load_state_dict(checkpoint['state_dict'])
-            optimizer.load_state_dict(checkpoint['optimizer'])
-            print("=> loaded checkpoint '{}' (epoch {})"
-                  .format(args.resume, checkpoint['epoch']))
-        else:
-            print("=> no checkpoint found at '{}'".format(args.resume))
+        args, model, optimizer, best_acc1 = resume_from_checkpoint(args, model, optimizer, best_acc1)
 
     cudnn.benchmark = True
 
+    # Data loading code
+    train_dataset, val_dataset, test_dataset = get_data_by_name(args.data_format, data_dir=args.data)
+
+    # train data loader is here, distribute is support #
     if args.distributed:
         train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset)
+        val_sampler = torch.utils.data.distributed.DistributedSampler(val_dataset)
+        # val_sampler = None
     else:
         train_sampler = None
+        val_sampler = None
 
     train_loader = torch.utils.data.DataLoader(
         train_dataset, batch_size=args.batch_size, shuffle=(train_sampler is None),
         num_workers=args.workers, pin_memory=True, sampler=train_sampler)
+    # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ #
 
+    # val data loader is here #
     val_loader = torch.utils.data.DataLoader(
         val_dataset,
-        batch_size=args.batch_size, shuffle=False,
-        num_workers=args.workers, pin_memory=True)
-
+        batch_size=args.batch_size, shuffle=(val_sampler is None),
+        num_workers=args.workers, pin_memory=True, sampler=val_sampler)
+    # ^^^^^^^^^^^^^^^^^^^^^^^ #
     if args.evaluate:
         validate(val_loader, model, criterion, args)
+        return
+
+    if args.test:
+        test_loader = torch.utils.data.DataLoader(
+            test_dataset,
+            batch_size=args.batch_size, shuffle=False,
+            num_workers=args.workers, pin_memory=True)
+
+        # validate(train_loader, model, criterion, args)
+        # print('TEST IN TRAIN SET')
+        # validate(val_loader, model, criterion, args)
+        # print('TEST IN VAL SET')
+        validate(test_loader, model, criterion, args)
+        print('TEST IN TEST SET')
         return
 
     for epoch in range(args.start_epoch, args.epochs):
         if args.distributed:
             train_sampler.set_epoch(epoch)
+            val_sampler.set_epoch(epoch)
+        # adjust_learning_rate(optimizer, epoch, args)
         adjust_learning_rate(optimizer, epoch, args)
 
         # train for one epoch
@@ -124,3 +158,7 @@ def main_worker(gpu, ngpus_per_node, model, train_dataset, val_dataset, args):
                 'best_acc1': best_acc1,
                 'optimizer': optimizer.state_dict(),
             }, is_best)
+            if is_best:
+                copy_weights(args, epoch)
+
+    copy_weights(args, args.epochs)

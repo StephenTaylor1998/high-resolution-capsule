@@ -8,6 +8,7 @@ cifar_normalize = transforms.Normalize(mean=[0.4914, 0.4822, 0.4465],
 
 cifar_transform_train = transforms.Compose([
     transforms.RandomCrop(32, padding=1),
+    transforms.RandomRotation((-30, 30)),
     # transforms.RandomHorizontalFlip(),
     transforms.ToTensor(),
     cifar_normalize,
@@ -40,9 +41,3 @@ def val_dataset(data_dir, transform=cifar_transform_test, **kwargs):
 # test dataset example for tiny-image-net
 def test_dataset(data_dir, transform=cifar_transform_test, **kwargs):
     return datasets.SVHN(root=data_dir, split='test', transform=transform, download=True, **kwargs)
-
-
-'''
-python train_imagenet.py -d svhn -a hr_caps_r_fpn -b 512 -j 2 -c 10 --epoch 250 --dist-url 'tcp://127.0.0.1:8889' --dist-backend 'nccl' --multiprocessing-distributed --world-size 1 --rank 0 ./data/dataset/ --lr-scheduler cifar --backbone resnet10_dwt_tiny_half --routing-name-list FPN FPN --in-shape 1 32 32
-python train_imagenet.py -d svhn -a hr_caps_r_fpn -b 512 -j 2 -c 10 --epoch 250 ./data/dataset/svhn --lr-scheduler cifar --backbone resnet10_dwt_tiny_half --routing-name-list FPN FPN --in-shape 1 32 32
-'''

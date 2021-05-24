@@ -52,7 +52,7 @@ class Conv2DCaps(nn.Module):
                                out_channels=out_channels,
                                kernel_size=self.kernel_size,
                                stride=self.stride,
-                               padding=self.pad).cuda()
+                               padding=self.pad)
 
     def forward(self, inputs):
         self.batch, self.ch_i, self.n_i, self.h_i, self.w_i = inputs.shape
@@ -81,7 +81,7 @@ class ConvCapsLayer3D(nn.Module):
                                out_channels=out_channels,
                                kernel_size=self.kernel_size,
                                stride=stride,
-                               padding=pad).cuda()
+                               padding=pad)
 
     def forward(self, inputs):
         self.batch, self.ch_i, self.n_i, self.h_i, self.w_i = inputs.shape
@@ -150,7 +150,7 @@ class CapsuleLayer(nn.Module):
     def forward(self, x):
         x = x.unsqueeze(2).unsqueeze(dim=4)
         u_hat = torch.matmul(self.W, x).squeeze()
-        b_ij = x.new(x.shape[0], self.num_routes, self.num_capsules, 1).zero_()
+        b_ij = x.new(x.shape[0], self.num_routes, self.num_capsules, 1).zero_().cuda()
         for itr in range(self.routing_iters):
             c_ij = func.softmax(b_ij, dim=2)
             s_j = (c_ij * u_hat).sum(dim=1, keepdim=True) + self.bias
